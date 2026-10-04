@@ -1,17 +1,22 @@
 // Offline-Unterstützung: Beim Laden wird alles zwischengespeichert.
 // Bei jeder Änderung an Dateien die Versionsnummer erhöhen, damit Geräte das Update laden.
-const VERSION = 'solohalma-v1';
+const VERSION = 'spring-v2.0.0';
 
 const FILES = [
   './',
   './index.html',
   './css/style.css',
   './js/main.js',
-  './js/boards.js',
+  './js/figures.js',
   './js/game.js',
   './js/view.js',
+  './js/gutter.js',
   './js/sound.js',
   './js/storage.js',
+  './js/i18n.js',
+  './js/tilt.js',
+  './js/solver.js',
+  './js/solver-worker.js',
   './manifest.webmanifest',
   './icons/icon.svg',
   './icons/icon-192.png',

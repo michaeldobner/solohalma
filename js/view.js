@@ -1,11 +1,16 @@
-// Darstellung des runden Bretts als SVG, inklusive Animationen und Touch-Bedienung.
+// Darstellung des runden Bretts als SVG: Murmeln, Animationen, Touch-Bedienung und die Rinne.
+//
+// Es gibt immer genau 32 Murmeln (16 blaue, 16 schwarze). Murmeln, die eine Figur nicht braucht,
+// und geschlagene Murmeln liegen in der Rinne. Beim Wechsel der Figur baut sich das Brett sichtbar um.
+
+import { Gutter } from './gutter.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const VB = 1000;
 const CENTER = VB / 2;
 
 const PLATE_R = 494; // Außenkante des Bretts
-const GUTTER_OUTER = 484; // Rinne für geschlagene Murmeln
+const GUTTER_OUTER = 484; // Rinne
 const GUTTER_INNER = 408;
 const DISC_R = 404; // Spielfläche
 const GUTTER_R = (GUTTER_OUTER + GUTTER_INNER) / 2;
@@ -13,40 +18,55 @@ const GUTTER_R = (GUTTER_OUTER + GUTTER_INNER) / 2;
 const S = 110; // Abstand der Felder
 const MR = 37; // Radius einer Murmel
 const HOLE_R = 13;
+const POOL = 32;
 
 const LIFT = 0.12; // Vergrößerung beim Anheben
 const TAP_SLOP = 10; // Pixel, ab denen aus einem Tippen ein Ziehen wird
 
 export class BoardView {
-  constructor(svg, game, { onMove, onInvalid } = {}) {
+  constructor(svg, events = {}) {
     this.svg = svg;
-    this.game = game;
-    this.onMove = onMove || (() => {});
-    this.onInvalid = onInvalid || (() => {});
+    this.events = events;
+    this.game = null;
     this.selected = -1;
+    this.hintTo = -1;
     this.busy = false;
     this.drag = null;
-    this.marbleEls = new Map();
+    this.rimTouch = null;
+    this.pool = []; // alle 32 Murmeln
+    this.idMap = []; // Murmel-ID im Spiel -> Index im Pool
+    this.loopRunning = false;
+
+    this.gutter = new Gutter({
+      radius: GUTTER_R,
+      marbleRadius: MR,
+      onCollide: (i) => this.emit('clack', i),
+      onRoll: (level) => this.emit('roll', level),
+    });
 
     this.build();
     this.bindInput();
-    this.sync();
+  }
+
+  emit(name, ...args) {
+    const fn = this.events[name];
+    if (fn) fn(...args);
   }
 
   // ---------- Geometrie ----------
 
   cellPos(i) {
     const { r, c } = this.game.cells[i];
-    const mr = (this.game.rows - 1) / 2;
-    const mc = (this.game.cols - 1) / 2;
-    return { x: CENTER + (c - mc) * S, y: CENTER + (r - mr) * S };
+    return { x: CENTER + (c - 3) * S, y: CENTER + (r - 3) * S };
   }
 
-  gutterPos(slot) {
-    // Geschlagene Murmeln reihen sich ab unten im Uhrzeigersinn in die Rinne
-    const step = 2 * Math.asin((MR + 2.5) / GUTTER_R);
-    const a = Math.PI / 2 + slot * step;
-    return { x: CENTER + GUTTER_R * Math.cos(a), y: CENTER + GUTTER_R * Math.sin(a) };
+  rimPos(angle) {
+    const p = this.gutter.position(angle);
+    return { x: CENTER + p.x, y: CENTER + p.y };
+  }
+
+  angleAt(p) {
+    return Math.atan2(p.y - CENTER, p.x - CENTER);
   }
 
   // ---------- Aufbau ----------
@@ -111,7 +131,15 @@ export class BoardView {
     this.targetsEl = svg.querySelector('.targets');
     this.marblesEl = svg.querySelector('.marbles');
 
-    // Feine weiße Linien zwischen benachbarten Feldern (nur waagerecht und senkrecht)
+    // 16 blaue und 16 schwarze Murmeln, zunächst alle in der Rinne
+    for (let i = 0; i < POOL; i++) {
+      this.pool.push(this.createMarble(i < POOL / 2 ? 'blue' : 'black'));
+    }
+  }
+
+  // Linien und Mulden hängen nur vom Brett ab, das für alle Figuren gleich ist
+  drawBoard() {
+    if (this.linesEl.childElementCount) return;
     const g = this.game;
     g.cells.forEach((cell, i) => {
       for (const [dr, dc] of [[0, 1], [1, 0]]) {
@@ -122,19 +150,9 @@ export class BoardView {
         this.linesEl.appendChild(el('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y }));
       }
     });
-
     g.cells.forEach((_, i) => {
       const p = this.cellPos(i);
       this.holesEl.appendChild(el('circle', { cx: p.x, cy: p.y, r: HOLE_R, fill: 'url(#g-hole)' }));
-    });
-
-    // Jede Murmel bekommt ein festes Element. Blau und Schwarz wechseln sich im Schachbrettmuster ab.
-    // Die IDs entstehen in derselben Reihenfolge wie in Game.reset(), auch wenn ein gespeichertes Spiel geladen wurde.
-    let id = 0;
-    g.cells.forEach((cell) => {
-      if (!cell.start) return;
-      const color = (cell.r + cell.c) % 2 === 0 ? 'blue' : 'black';
-      this.marbleEls.set(id++, this.createMarble(color));
     });
   }
 
@@ -148,7 +166,7 @@ export class BoardView {
     });
     group.append(shadow, body, shine);
     this.marblesEl.appendChild(group);
-    return { group, shadow, x: 0, y: 0, lift: 0 };
+    return { group, shadow, color, x: CENTER, y: CENTER + GUTTER_R, lift: 0, flying: false };
   }
 
   place(m, x, y, lift = 0) {
@@ -163,39 +181,193 @@ export class BoardView {
     m.shadow.setAttribute('opacity', (1 - 0.35 * lift).toFixed(2));
   }
 
-  // Alle Murmeln ohne Animation auf ihre Position setzen (nach Laden, Neustart)
-  sync() {
-    const g = this.game;
-    g.marbles.forEach((id, i) => {
-      if (id === null) return;
-      const p = this.cellPos(i);
-      this.place(this.marbleEls.get(id), p.x, p.y);
+  toFront(m) {
+    this.marblesEl.appendChild(m.group);
+  }
+
+  toBack(m) {
+    this.marblesEl.insertBefore(m.group, this.marblesEl.firstChild);
+  }
+
+  marbleOf(gameId) {
+    return this.pool[this.idMap[gameId]];
+  }
+
+  // ---------- Figur setzen ----------
+
+  // Ordnet jeder Murmel der Figur eine Murmel passender Farbe aus dem Pool zu.
+  // Blau und Schwarz wechseln sich im Schachbrettmuster ab.
+  mapFigure(game) {
+    const blue = [];
+    const black = [];
+    this.pool.forEach((m, i) => (m.color === 'blue' ? blue : black).push(i));
+    const map = [];
+    game.cells.forEach((cell) => {
+      if (!cell.start) return;
+      map.push((cell.r + cell.c) % 2 === 0 ? blue.shift() : black.shift());
     });
-    g.history.forEach((rec, slot) => {
-      const p = this.gutterPos(slot);
-      this.place(this.marbleEls.get(rec.captured), p.x, p.y);
+    return map;
+  }
+
+  // Zielzustand aller Pool-Murmeln: Feldindex oder -1 für die Rinne
+  targets(game, idMap) {
+    const where = new Array(POOL).fill(-1);
+    game.marbles.forEach((id, i) => {
+      if (id !== null) where[idMap[id]] = i;
     });
+    return where;
+  }
+
+  // Ohne Animation (Start der App)
+  setGame(game) {
+    this.game = game;
+    this.drawBoard();
+    this.idMap = this.mapFigure(game);
+    const where = this.targets(game, this.idMap);
+    // Geschlagene Murmeln in Zugreihenfolge, danach die ungenutzten
+    const captured = game.history.map((h) => this.idMap[h.captured]);
+    const rest = this.pool.map((_, i) => i).filter((i) => where[i] < 0 && !captured.includes(i));
+    this.gutter.pack([...captured, ...rest]);
+    where.forEach((cell, i) => {
+      const m = this.pool[i];
+      m.flying = false;
+      if (cell >= 0) {
+        const p = this.cellPos(cell);
+        this.place(m, p.x, p.y);
+      }
+    });
+    this.renderGutter();
     this.select(-1);
   }
 
-  // ---------- Auswahl und Ziele ----------
+  // Mit Animation: Figur wechseln oder neu beginnen
+  async morph(game) {
+    this.busy = true;
+    this.select(-1);
+    this.game = game;
+    const idMap = this.mapFigure(game);
+    const where = this.targets(game, idMap);
+    const jobs = [];
+    let delay = 0;
+
+    where.forEach((cell, i) => {
+      const m = this.pool[i];
+      const inGutter = this.gutter.has(i);
+      if (cell >= 0) {
+        const p = this.cellPos(cell);
+        if (!inGutter && Math.hypot(m.x - p.x, m.y - p.y) < 1) return;
+        this.gutter.remove(i);
+        m.flying = true;
+        this.toFront(m);
+        const from = { x: m.x, y: m.y };
+        jobs.push(wait(delay).then(() => tween(460, (t) => {
+          this.place(m, lerp(from.x, p.x, t), lerp(from.y, p.y, t), Math.sin(Math.PI * t));
+        })).then(() => { m.flying = false; }));
+        delay += 12;
+      } else if (!inGutter) {
+        jobs.push(this.toRim(i, delay));
+        delay += 12;
+      }
+    });
+
+    this.idMap = idMap;
+    this.startLoop();
+    await Promise.all(jobs);
+    this.busy = false;
+  }
+
+  // Eine Murmel vom Brett in die Rinne rollen lassen, möglichst an die nächste freie Stelle
+  toRim(poolIndex, delay = 0, nudge = 0.6) {
+    const m = this.pool[poolIndex];
+    const angle = this.gutter.freeAngle(this.angleAt(m));
+    this.gutter.add(poolIndex, angle, 0);
+    m.flying = true;
+    this.toBack(m);
+    const from = { x: m.x, y: m.y };
+    return wait(delay)
+      .then(() => tween(420, (t) => {
+        const to = this.rimPos(this.gutter.angleOf(poolIndex) ?? angle);
+        this.place(m, lerp(from.x, to.x, t), lerp(from.y, to.y, t), 0.6 * Math.sin(Math.PI * t));
+      }))
+      .then(() => {
+        m.flying = false;
+        // Kleiner Schubs, damit sich die Nachbarn zurechtruckeln
+        const it = this.gutter.items.get(poolIndex);
+        if (it) it.v = (Math.random() < 0.5 ? -1 : 1) * nudge;
+        this.startLoop();
+      });
+  }
+
+  // ---------- Rinne ----------
+
+  renderGutter() {
+    for (const [i, it] of this.gutter.items) {
+      const m = this.pool[i];
+      if (m.flying) continue;
+      const p = this.rimPos(it.a);
+      this.place(m, p.x, p.y);
+    }
+  }
+
+  startLoop() {
+    if (this.loopRunning) return;
+    this.loopRunning = true;
+    let last = performance.now();
+    let idle = 0;
+    const frame = (now) => {
+      const dt = Math.min(0.033, (now - last) / 1000);
+      last = now;
+      // Mehrere kleine Schritte für stabile Stöße
+      const moving = [0, 1, 2].map(() => this.gutter.step(dt / 3)).some(Boolean);
+      this.renderGutter();
+      const flying = this.pool.some((m) => m.flying);
+      idle = moving || flying || this.rimTouch ? 0 : idle + 1;
+      if (idle > 10) {
+        this.loopRunning = false;
+        this.emit('roll', 0);
+        return;
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+
+  setGravity(x, y) {
+    const old = this.gutter.gravity;
+    this.gutter.gravity = { x, y };
+    if (Math.hypot(x - old.x, y - old.y) > 0.02) this.startLoop();
+  }
+
+  // ---------- Auswahl, Ziele und Tipps ----------
 
   select(i) {
-    if (this.selected >= 0) {
-      const prev = this.marbleEls.get(this.game.marbles[this.selected]);
+    if (this.selected >= 0 && this.game) {
+      const id = this.game.marbles[this.selected];
+      const prev = id !== null ? this.marbleOf(id) : null;
       if (prev && !this.drag) this.animateLift(prev, 0);
     }
     this.selected = i;
+    this.hintTo = -1;
     this.targetsEl.innerHTML = '';
     if (i < 0) return;
 
-    const m = this.marbleEls.get(this.game.marbles[i]);
-    this.marblesEl.appendChild(m.group);
+    const m = this.marbleOf(this.game.marbles[i]);
+    this.toFront(m);
     this.animateLift(m, 1);
+    this.emit('lift');
     for (const move of this.game.movesFrom(i)) {
       const p = this.cellPos(move.to);
       this.targetsEl.appendChild(el('circle', { class: 'target', cx: p.x, cy: p.y, r: MR * 0.72 }));
     }
+  }
+
+  // Tipp: Murmel anheben und nur das empfohlene Ziel zeigen
+  showHint(from, to) {
+    this.select(from);
+    this.targetsEl.innerHTML = '';
+    this.hintTo = to;
+    const p = this.cellPos(to);
+    this.targetsEl.appendChild(el('circle', { class: 'target hint', cx: p.x, cy: p.y, r: MR * 0.78 }));
   }
 
   animateLift(m, to) {
@@ -209,36 +381,28 @@ export class BoardView {
     this.busy = true;
     this.targetsEl.innerHTML = '';
     const g = this.game;
-    const m = this.marbleEls.get(g.marbles[move.from]);
-    const cap = this.marbleEls.get(g.marbles[move.over]);
+    const m = this.marbleOf(g.marbles[move.from]);
+    const capIndex = this.idMap[g.marbles[move.over]];
     const start = fromPos || { x: m.x, y: m.y };
     const startLift = m.lift;
     const end = this.cellPos(move.to);
-    const slot = g.history.length;
 
     this.selected = -1;
-    this.marblesEl.appendChild(m.group);
+    this.hintTo = -1;
+    this.toFront(m);
 
-    // Sprung im kleinen Bogen
     const jump = tween(fromPos ? 170 : 280, (t) => {
       const lift = fromPos ? startLift * (1 - t) : Math.max(startLift * (1 - t), Math.sin(Math.PI * t));
       this.place(m, lerp(start.x, end.x, t), lerp(start.y, end.y, t), lift);
     });
 
     const record = g.apply(move);
-    this.onMove(record, 'jump');
-
+    this.emit('move', record, 'jump');
     await jump;
-    this.onMove(record, 'land');
+    this.emit('move', record, 'land');
 
-    // Die geschlagene Murmel rollt in die Rinne
-    const gp = this.gutterPos(slot);
-    const cs = { x: cap.x, y: cap.y };
-    this.marblesEl.insertBefore(cap.group, this.marblesEl.firstChild);
-    await tween(420, (t) => {
-      this.place(cap, lerp(cs.x, gp.x, t), lerp(cs.y, gp.y, t), 0.6 * Math.sin(Math.PI * t));
-    });
-    this.onMove(record, 'gutter');
+    await this.toRim(capIndex, 0, 0.8);
+    this.emit('move', record, 'gutter');
     this.busy = false;
     return record;
   }
@@ -250,22 +414,27 @@ export class BoardView {
     if (!rec) return null;
     this.busy = true;
     this.select(-1);
-    const m = this.marbleEls.get(rec.marble);
-    const cap = this.marbleEls.get(rec.captured);
+    const m = this.marbleOf(rec.marble);
+    const capIndex = this.idMap[rec.captured];
+    const cap = this.pool[capIndex];
+    this.gutter.remove(capIndex);
+    cap.flying = true;
+    this.toFront(cap);
     const back = this.cellPos(rec.from);
     const over = this.cellPos(rec.over);
     const ms = { x: m.x, y: m.y };
     const cs = { x: cap.x, y: cap.y };
     await Promise.all([
-      tween(320, (t) => this.place(cap, lerp(cs.x, over.x, t), lerp(cs.y, over.y, t), 0.6 * Math.sin(Math.PI * t))),
+      tween(340, (t) => this.place(cap, lerp(cs.x, over.x, t), lerp(cs.y, over.y, t), 0.7 * Math.sin(Math.PI * t))),
       tween(260, (t) => this.place(m, lerp(ms.x, back.x, t), lerp(ms.y, back.y, t), Math.sin(Math.PI * t))),
     ]);
+    cap.flying = false;
     this.busy = false;
     return rec;
   }
 
   shake(i) {
-    const m = this.marbleEls.get(this.game.marbles[i]);
+    const m = this.marbleOf(this.game.marbles[i]);
     const { x, y } = m;
     tween(260, (t) => this.place(m, x + Math.sin(t * Math.PI * 5) * 6 * (1 - t), y));
   }
@@ -298,13 +467,27 @@ export class BoardView {
     svg.addEventListener('pointerdown', (e) => this.down(e));
     svg.addEventListener('pointermove', (e) => this.moveDrag(e));
     svg.addEventListener('pointerup', (e) => this.up(e));
-    svg.addEventListener('pointercancel', () => this.cancelDrag());
+    svg.addEventListener('pointercancel', (e) => this.cancel(e));
   }
 
   down(e) {
-    if (this.busy || this.drag) return;
+    if (!this.game || this.drag || this.rimTouch) return;
     e.preventDefault();
     const p = this.toSvg(e);
+    const r = Math.hypot(p.x - CENTER, p.y - CENTER);
+
+    // Berührung im Rand: nur die Murmeln dort reagieren, das Spiel bleibt unberührt
+    if (r > DISC_R - 6 && r < PLATE_R + 40) {
+      capturePointer(this.svg, e.pointerId);
+      this.rimTouch = {
+        id: e.pointerId, a: this.angleAt(p), t: performance.now(),
+        sx: e.clientX, sy: e.clientY, moved: false,
+      };
+      this.startLoop();
+      return;
+    }
+    if (this.busy) return;
+
     const i = this.cellNear(p);
     const g = this.game;
 
@@ -325,12 +508,12 @@ export class BoardView {
     if (g.movesFrom(i).length === 0) {
       this.select(-1);
       this.shake(i);
-      this.onInvalid();
+      this.emit('invalid');
       return;
     }
 
     if (this.selected !== i) this.select(i);
-    const m = this.marbleEls.get(g.marbles[i]);
+    const m = this.marbleOf(g.marbles[i]);
     capturePointer(this.svg, e.pointerId);
     this.drag = {
       id: e.pointerId, from: i, m,
@@ -341,6 +524,22 @@ export class BoardView {
   }
 
   moveDrag(e) {
+    const rt = this.rimTouch;
+    if (rt && e.pointerId === rt.id) {
+      if (!rt.moved && Math.hypot(e.clientX - rt.sx, e.clientY - rt.sy) < TAP_SLOP) return;
+      rt.moved = true;
+      const now = performance.now();
+      const a = this.angleAt(this.toSvg(e));
+      let da = a - rt.a;
+      if (da > Math.PI) da -= 2 * Math.PI;
+      if (da < -Math.PI) da += 2 * Math.PI;
+      const dt = Math.max(0.008, (now - rt.t) / 1000);
+      this.gutter.push(a, da / dt);
+      rt.a = a;
+      rt.t = now;
+      return;
+    }
+
     const d = this.drag;
     if (!d || e.pointerId !== d.id) return;
     if (!d.active && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < TAP_SLOP) return;
@@ -350,6 +549,14 @@ export class BoardView {
   }
 
   up(e) {
+    const rt = this.rimTouch;
+    if (rt && e.pointerId === rt.id) {
+      this.rimTouch = null;
+      if (!rt.moved) this.gutter.nudge(rt.a);
+      this.startLoop();
+      return;
+    }
+
     const d = this.drag;
     if (!d || e.pointerId !== d.id) return;
     this.drag = null;
@@ -364,7 +571,11 @@ export class BoardView {
     }
   }
 
-  cancelDrag() {
+  cancel(e) {
+    if (this.rimTouch && e.pointerId === this.rimTouch.id) {
+      this.rimTouch = null;
+      return;
+    }
     const d = this.drag;
     if (!d) return;
     this.drag = null;
@@ -403,6 +614,10 @@ function lerp(a, b, t) {
 
 function ease(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function wait(ms) {
+  return ms > 0 ? new Promise((r) => setTimeout(r, ms)) : Promise.resolve();
 }
 
 function tween(duration, step) {

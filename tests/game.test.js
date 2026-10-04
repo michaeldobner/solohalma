@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BOARDS } from '../js/boards.js';
+import { figureById } from '../js/figures.js';
 import { Game } from '../js/game.js';
 
-const newGame = () => new Game(BOARDS.englisch);
+const newGame = () => new Game(figureById('klassisch'));
 
 test('Startstellung: 33 Felder, 32 Murmeln, Mitte frei', () => {
   const g = newGame();
@@ -63,12 +63,13 @@ test('Eine bekannte Lösung endet mit einer Murmel in der Mitte (Meisterhaft)', 
   assert.equal(g.count, 1);
   assert.ok(g.isOver);
   assert.ok(g.isPerfect);
-  assert.equal(g.rating().title, 'Meisterhaft');
+  assert.equal(g.rating().key, 'perfect');
+  assert.equal(g.rating().stars, 3);
 });
 
 test('Bewertung nach Restmurmeln', () => {
   const g = newGame();
-  assert.equal(g.rating().title, 'Weiter üben');
+  assert.deepEqual(g.rating(), { key: 'more', stars: 0, left: 32 });
 });
 
 // Einfacher Löser mit Merkliste bereits gesehener Stellungen

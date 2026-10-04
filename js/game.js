@@ -1,5 +1,7 @@
 // Spiellogik ohne Darstellung. Kennt nur Felder, Murmeln und Sprünge.
 
+import { GOAL } from './figures.js';
+
 const DIRECTIONS = [
   [-1, 0],
   [1, 0],
@@ -96,18 +98,23 @@ export class Game {
   }
 
   get isPerfect() {
-    const [gr, gc] = this.board.goal;
+    const [gr, gc] = this.board.goal || GOAL;
     return this.count === 1 && this.hasMarble(this.cellAt(gr, gc));
   }
 
-  // Bewertung am Spielende
+  // Bewertung am Spielende: Schlüssel für die Übersetzung und Sterne (0 bis 3)
   rating() {
     const n = this.count;
-    if (this.isPerfect) return { title: 'Meisterhaft', text: 'Eine Murmel, genau in der Mitte.' };
-    if (n === 1) return { title: 'Sehr gut', text: 'Nur noch eine Murmel übrig.' };
-    if (n === 2) return { title: 'Gut', text: 'Zwei Murmeln übrig.' };
-    if (n === 3) return { title: 'Ordentlich', text: 'Drei Murmeln übrig.' };
-    return { title: 'Weiter üben', text: `${n} Murmeln übrig.` };
+    if (this.isPerfect) return { key: 'perfect', stars: 3, left: n };
+    if (n === 1) return { key: 'one', stars: 2, left: n };
+    if (n === 2) return { key: 'two', stars: 1, left: n };
+    if (n === 3) return { key: 'three', stars: 1, left: n };
+    return { key: 'more', stars: 0, left: n };
+  }
+
+  // Belegung als Liste aus true und false, zum Beispiel für den Löser
+  occupancy() {
+    return this.marbles.map((m) => m !== null);
   }
 
   // Spielstand für localStorage
