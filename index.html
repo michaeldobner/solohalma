@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Solohalma</title>
+  <meta name="description" content="Das klassische Solohalma auf dem englischen Kreuzbrett mit 33 Feldern.">
+  <meta name="theme-color" content="#ece8e1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141519" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Solohalma">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <h1 class="brand">Solohalma</h1>
+      <div class="counter" aria-live="polite">
+        <span id="count" class="count">32</span>
+        <span id="count-label" class="count-label">Murmeln</span>
+      </div>
+    </header>
+
+    <main class="stage">
+      <svg id="board" class="board" role="img" aria-label="Spielbrett mit 33 Feldern"></svg>
+
+      <section id="result" class="result" hidden aria-live="polite">
+        <div class="card">
+          <p class="result-kicker">Spiel beendet</p>
+          <h2 id="result-title" class="result-title"></h2>
+          <p id="result-text" class="result-text"></p>
+          <p id="result-stats" class="result-stats"></p>
+          <div class="result-actions">
+            <button id="back" class="btn ghost" type="button">Zurück</button>
+            <button id="again" class="btn solid" type="button">Neues Spiel</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="controls" aria-label="Steuerung">
+      <button id="undo" class="icon-btn" type="button" aria-label="Rückgängig">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+        <span>Zurück</span>
+      </button>
+      <button id="restart" class="icon-btn" type="button" aria-label="Neues Spiel">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
+        <span class="label-normal">Neu</span>
+        <span class="label-confirm">Sicher?</span>
+      </button>
+      <button id="sound" class="icon-btn" type="button" aria-label="Ton aus" aria-pressed="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="wave" d="M19 6a8.5 8.5 0 0 1 0 12"/><path class="mute" d="m16 9 6 6m0-6-6 6"/></svg>
+        <span>Ton</span>
+      </button>
+    </nav>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
