@@ -203,4 +203,10 @@ switchFigure(id)
 
 ## Offline
 
-On the first visit `sw.js` stores every file in a versioned cache. Requests go to the network first so updates arrive immediately. Without a network the answer comes from the cache. Details: [Deployment](deployment.md).
+Three rules make sure exactly one version always runs completely and old and new files never mix:
+
+1. **Versioned URLs:** every reference to CSS and JavaScript carries `?v=<version>`, in `index.html`, in every `import` line and for the Web Worker. A new version therefore only loads new URLs that no cache can know. `tests/release.test.js` checks this on every push.
+2. **Network first, bypassing the browser cache:** `sw.js` fetches every file with `cache: 'no-cache'`. Only without a network does it come from the offline store, which is filled fresh with `cache: 'reload'` on install.
+3. **One reload:** when a new service worker takes control (`controllerchange`), `main.js` reloads the page once.
+
+Details: [Deployment](deployment.md).

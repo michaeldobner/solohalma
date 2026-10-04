@@ -64,7 +64,7 @@ SPRING macht aus dem alten Holzbrettspiel ein ruhiges, fast greifbares Erlebnis.
 
 ```bash
 npm start   # lokaler Server
-npm test    # 26 automatische Tests
+npm test    # 29 automatische Tests
 ```
 
 Keine Abhängigkeiten, kein Build-Schritt. Reines HTML, CSS und JavaScript-Module.
@@ -102,10 +102,11 @@ Keine Abhängigkeiten, kein Build-Schritt. Reines HTML, CSS und JavaScript-Modul
 ├─ icons/                  App-Symbole
 ├─ sw.js                   Offline-Betrieb
 ├─ manifest.webmanifest    Installation als App
+├─ scripts/release.mjs     setzt eine neue Version überall
 ├─ tests/                  automatische Tests
 └─ docs/                   Dokumentation (de, en, Bilder)
 ```
 
 ## Version
 
-Aktuelle Version: **2.0.0**. Siehe [Changelog](CHANGELOG.de.md).
+Aktuelle Version: **2.0.1**. Siehe [Changelog](CHANGELOG.de.md).

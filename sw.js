@@ -1,52 +1,55 @@
-// Offline-Unterstützung: Beim Laden wird alles zwischengespeichert.
-// Bei jeder Änderung an Dateien die Versionsnummer erhöhen, damit Geräte das Update laden.
-const VERSION = 'spring-v2.0.0';
+// Offline-Unterstützung für SPRING.
+//
+// Jede Version lädt nur ihre eigenen Dateien: Alle Verweise tragen ?v=<Version>
+// (siehe scripts/release.mjs). So können sich alte und neue Dateien nie mischen.
+const VERSION = '2.0.1';
+const CACHE = `spring-v${VERSION}`;
+const V = `?v=${VERSION}`;
 
 const FILES = [
   './',
   './index.html',
-  './css/style.css',
-  './js/main.js',
-  './js/figures.js',
-  './js/game.js',
-  './js/view.js',
-  './js/gutter.js',
-  './js/sound.js',
-  './js/storage.js',
-  './js/i18n.js',
-  './js/tilt.js',
-  './js/solver.js',
-  './js/solver-worker.js',
   './manifest.webmanifest',
   './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
+  `./css/style.css${V}`,
+  ...['main', 'figures', 'game', 'view', 'gutter', 'sound', 'storage', 'i18n', 'tilt', 'solver', 'solver-worker']
+    .map((name) => `./js/${name}.js${V}`),
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(FILES)));
+  // cache: 'reload' umgeht den Browser-Cache, damit wirklich die neue Version gespeichert wird
+  event.waitUntil(
+    caches.open(CACHE).then((cache) => cache.addAll(FILES.map((f) => new Request(f, { cache: 'reload' })))),
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))),
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))),
   );
   self.clients.claim();
 });
 
-// Erst aus dem Netz (damit Updates sofort ankommen), sonst aus dem Zwischenspeicher
+// Erst aus dem Netz (am Browser-Cache vorbei geprüft), sonst aus dem Offline-Speicher
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  const request = event.request;
+  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+  const fresh = request.mode === 'navigate'
+    ? fetch(request.url, { cache: 'no-cache', credentials: 'same-origin' })
+    : fetch(request, { cache: 'no-cache' });
   event.respondWith(
-    fetch(event.request)
+    fresh
       .then((response) => {
-        if (!response.ok) return response;
-        const copy = response.clone();
-        caches.open(VERSION).then((cache) => cache.put(event.request, copy));
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, copy));
+        }
         return response;
       })
-      .catch(() => caches.match(event.request, { ignoreSearch: true })),
+      .catch(() => caches.match(request).then((hit) => hit || caches.match(request, { ignoreSearch: true }))),
   );
 });

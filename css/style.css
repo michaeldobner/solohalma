@@ -263,10 +263,11 @@ button {
 
 .icon-btn {
   display: flex;
+  flex: 0 1 58px;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  min-width: 58px;
+  min-width: 0;
   padding: 0;
   border: 0;
   background: none;
@@ -773,6 +774,25 @@ button {
 .segmented button[aria-checked="true"] {
   background: var(--card);
   box-shadow: var(--shadow);
+}
+
+/* ---------- Sehr schmale Geräte (iPhone SE 1. Generation) ---------- */
+
+@media (max-width: 359px) {
+  .controls {
+    gap: 2px;
+  }
+
+  .icon-btn {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
+
+  .icon-btn svg {
+    width: 46px;
+    height: 46px;
+    padding: 12px;
+  }
 }
 
 /* ---------- iPhone quer: Steuerung rechts, Figuren als Schublade links ---------- */

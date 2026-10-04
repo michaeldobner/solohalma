@@ -2,6 +2,16 @@
 
 All notable changes to SPRING. [Deutsch](CHANGELOG.de.md)
 
+## 2.0.1 (2026-10-04)
+
+### Fixed
+* On devices that had already loaded an earlier version, new and old files could mix after an update. The result was an empty field below SPRING, missing button labels, a layout that spilled over to the right and buttons that did not work. Every version now loads only its own files (`?v=` on every reference), the service worker bypasses the browser cache and the page reloads once when a new version takes over.
+* On very narrow iPhones (SE, 1st generation) the five buttons now fit on screen.
+
+### Technical
+* New `scripts/release.mjs` sets a version number everywhere.
+* New `tests/release.test.js` checks versioned references, so the error cannot return. 29 tests in total.
+
 ## 2.0.0 (2026-10-04)
 
 The game is now called **SPRING**.

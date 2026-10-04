@@ -64,7 +64,7 @@ SPRING turns the old wooden board game into a calm, tactile experience. A round,
 
 ```bash
 npm start   # local server
-npm test    # 26 automated tests
+npm test    # 29 automated tests
 ```
 
 No dependencies, no build step. Plain HTML, CSS and JavaScript modules.
@@ -102,10 +102,11 @@ No dependencies, no build step. Plain HTML, CSS and JavaScript modules.
 ├─ icons/                  app icons
 ├─ sw.js                   offline support
 ├─ manifest.webmanifest    install as an app
+├─ scripts/release.mjs     sets a new version everywhere
 ├─ tests/                  automated tests
 └─ docs/                   documentation (de, en, images)
 ```
 
 ## Version
 
-Current version: **2.0.0**. See the [changelog](CHANGELOG.md).
+Current version: **2.0.1**. See the [changelog](CHANGELOG.md).

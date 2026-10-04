@@ -31,8 +31,8 @@ Die Datei `.nojekyll` sorgt dafür, dass GitHub die Dateien unverändert auslief
 ## Eine neue Version veröffentlichen
 
 1. Änderungen auf einem Branch machen und prüfen (siehe [Entwicklung](entwicklung.md#checkliste-vor-dem-veröffentlichen)).
-2. In `sw.js` die Konstante `VERSION` erhöhen, zum Beispiel `spring-v2.0.0` auf `spring-v2.1.0`, und neue Dateien in `FILES` eintragen.
-3. `VERSION` in `js/main.js` und `version` in `package.json` anpassen.
+2. Neue Versionsnummer überall setzen: `node scripts/release.mjs 2.1.0`. Das Skript ändert `package.json`, `js/main.js`, `sw.js` und alle `?v=` Verweise. Neue JavaScript-Dateien zusätzlich in die Liste in `sw.js` eintragen (der Test meldet es sonst).
+3. `npm test` ausführen.
 4. Beide Changelogs ergänzen.
 5. Branch in `main` übernehmen. Nach ein bis zwei Minuten ist die neue Version live.
 
@@ -40,7 +40,7 @@ Den Stand zeigt der Reiter **Actions** im Repository.
 
 ## Wie Updates auf die Geräte kommen
 
-Der Service Worker fragt immer zuerst das Netz. Ein geöffnetes Spiel mit Internetverbindung lädt also stets die aktuelle Version. Durch die neue `VERSION` werden alte Caches beim nächsten Start gelöscht. Ohne Internet startet die zuletzt geladene Version.
+Der Service Worker fragt immer zuerst das Netz, am Browser-Cache vorbei. Weil jede Version eigene Adressen für CSS und JavaScript nutzt, kann ein Gerät nie alte und neue Dateien mischen. Übernimmt eine neue Version, lädt die Seite einmal neu, alte Caches werden gelöscht. Ohne Internet startet die zuletzt geladene Version vollständig.
 
 Spielstände liegen im `localStorage` der Adresse `michaeldobner.github.io` und bleiben bei Updates erhalten.
 
@@ -54,7 +54,7 @@ Wird das Repository umbenannt, ändert sich die Adresse (zum Beispiel `/spring/`
 |---|---|
 | Seite zeigt 404 | Unter Settings > Pages prüfen, ob `main` und `/ (root)` eingestellt sind und „pages build and deployment“ erfolgreich war |
 | Workflow „Tests“ ist rot | `npm test` lokal ausführen, Fehler beheben, erneut pushen |
-| iPhone zeigt alte Version | App schließen und neu öffnen. Notfalls: Einstellungen > Apps > Safari > Erweitert > Website-Daten, Eintrag `michaeldobner.github.io` löschen (löscht auch Spielstände) |
+| iPhone zeigt alte Version oder ein zerschossenes Layout | App ganz schließen (nach oben wischen) und neu öffnen. Seit Version 2.0.1 kann das nicht mehr vorkommen, nur der Wechsel von älteren Versionen kann einmalig betroffen sein. Notfalls: Einstellungen > Apps > Safari > Erweitert > Website-Daten, Eintrag `michaeldobner.github.io` löschen (löscht auch Spielstände) |
 | Kein Ton | Lautlos-Schalter prüfen, Ton in den Einstellungen prüfen, einmal aufs Brett tippen (iOS gibt Ton erst nach einer Berührung frei) |
 | Neigen reagiert nicht | Neigen in den Einstellungen aus- und wieder einschalten und die Frage nach dem Bewegungssensor erlauben. Funktioniert nur über HTTPS |
 | App-Symbol fehlt | Prüfen, ob `icons/apple-touch-icon.png` erreichbar ist, dann neu zum Home-Bildschirm hinzufügen |

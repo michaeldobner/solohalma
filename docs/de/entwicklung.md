@@ -25,7 +25,7 @@ Sprache testen: Die Sprache folgt der Browsersprache. In Chrome unter Einstellun
 npm test
 ```
 
-26 Tests mit dem eingebauten Test-Runner von Node.js. Sie laufen außerdem bei jedem Push über GitHub Actions (`.github/workflows/tests.yml`).
+29 Tests mit dem eingebauten Test-Runner von Node.js. Sie laufen außerdem bei jedem Push über GitHub Actions (`.github/workflows/tests.yml`).
 
 | Datei | Prüft |
 |---|---|
@@ -34,6 +34,7 @@ npm test
 | `tests/gutter.test.js` | 31 Murmeln passen in den Rand, Bewegung kommt zur Ruhe, Stöße geben Schwung weiter, Neigung sammelt Murmeln unten, freie Plätze, Finger schiebt |
 | `tests/tilt.test.js` | Schwerkraft aus Gerätewinkeln in Hoch- und Querformat |
 | `tests/i18n.test.js` | Spracherkennung, Einzahl und Mehrzahl, gleiche Schlüssel in beiden Sprachen, keine Gedankenstriche |
+| `tests/release.test.js` | Alle Verweise tragen die aktuelle Version, Versionsnummern stimmen überein, der Service Worker kennt jedes Modul |
 
 ### Im Browser prüfen
 
@@ -80,7 +81,7 @@ Ohne HTTPS funktionieren Service Worker und Bewegungssensor nicht. Für diese be
 
 1. `npm test` ohne Fehler.
 2. Im Browser geprüft wie oben beschrieben.
-3. `VERSION` in `sw.js` erhöht, neue Dateien in `FILES` in `sw.js` eingetragen.
-4. `VERSION` in `js/main.js` und `version` in `package.json` angepasst.
+3. Version gesetzt mit `node scripts/release.mjs <version>`, neue Dateien in der Liste in `sw.js` eingetragen.
+4. Neue Verweise auf eigene Dateien immer mit `?v=<version>` schreiben, wie alle anderen.
 5. `CHANGELOG.md` und `CHANGELOG.de.md` ergänzt.
 6. Dokumentation in beiden Sprachen aktualisiert, bei sichtbaren Änderungen auch die Bilder in `docs/images`.

@@ -1,12 +1,12 @@
-import { FIGURES, GOAL, DEFAULT_FIGURE, figureById, nextFigure } from './figures.js';
-import { Game } from './game.js';
-import { BoardView } from './view.js';
-import { Sound, DEFAULT_STYLE } from './sound.js';
-import { load, save, migrate } from './storage.js';
-import { lang, t, translateDocument } from './i18n.js';
-import { Tilt } from './tilt.js';
+import { FIGURES, GOAL, DEFAULT_FIGURE, figureById, nextFigure } from './figures.js?v=2.0.1';
+import { Game } from './game.js?v=2.0.1';
+import { BoardView } from './view.js?v=2.0.1';
+import { Sound, DEFAULT_STYLE } from './sound.js?v=2.0.1';
+import { load, save, migrate } from './storage.js?v=2.0.1';
+import { lang, t, translateDocument } from './i18n.js?v=2.0.1';
+import { Tilt } from './tilt.js?v=2.0.1';
 
-export const VERSION = '2.0.0';
+export const VERSION = '2.0.1';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -235,7 +235,7 @@ function advanceHint(record) {
 }
 
 function askSolver() {
-  if (!worker) worker = new Worker(new URL('./solver-worker.js', import.meta.url), { type: 'module' });
+  if (!worker) worker = new Worker(new URL('./solver-worker.js?v=2.0.1', import.meta.url), { type: 'module' });
   const id = ++hintRequest;
   return new Promise((resolve) => {
     const onMessage = (e) => {
@@ -444,8 +444,17 @@ renderSettings();
 if (game.history.length > 0 && game.isOver) showResult();
 setTimeout(showCoach, 900);
 
+// Offline-Betrieb. Übernimmt eine neue Version die Kontrolle, lädt die Seite einmal neu,
+// damit nie Dateien zweier Versionen gleichzeitig laufen.
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
+  const hadController = Boolean(navigator.serviceWorker.controller);
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloaded) return;
+    reloaded = true;
+    location.reload();
+  });
+  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(() => {});
 }
 
 // Für automatische Tests im Browser

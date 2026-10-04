@@ -25,7 +25,7 @@ Testing the language: it follows the browser language. In Chrome under Settings 
 npm test
 ```
 
-26 tests using the built-in Node.js test runner. They also run on every push via GitHub Actions (`.github/workflows/tests.yml`).
+29 tests using the built-in Node.js test runner. They also run on every push via GitHub Actions (`.github/workflows/tests.yml`).
 
 | File | Checks |
 |---|---|
@@ -34,6 +34,7 @@ npm test
 | `tests/gutter.test.js` | 31 marbles fit into the rim, motion comes to rest, bumps pass on momentum, tilt gathers marbles at the bottom, free spots, finger pushes |
 | `tests/tilt.test.js` | Gravity from device angles in portrait and landscape |
 | `tests/i18n.test.js` | Language detection, singular and plural, same keys in both languages, no dashes |
+| `tests/release.test.js` | Every reference carries the current version, version numbers match, the service worker knows every module |
 
 ### Checking in the browser
 
@@ -80,7 +81,7 @@ Without HTTPS the service worker and the motion sensor do not work. Test those t
 
 1. `npm test` passes.
 2. Checked in the browser as described above.
-3. `VERSION` in `sw.js` bumped, new files added to `FILES` in `sw.js`.
-4. `VERSION` in `js/main.js` and `version` in `package.json` updated.
+3. Version set with `node scripts/release.mjs <version>`, new files added to the list in `sw.js`.
+4. New references to project files always written with `?v=<version>`, like all others.
 5. `CHANGELOG.md` and `CHANGELOG.de.md` updated.
 6. Documentation updated in both languages, for visible changes also the images in `docs/images`.

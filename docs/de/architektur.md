@@ -203,4 +203,10 @@ switchFigure(id)
 
 ## Offline-Betrieb
 
-`sw.js` legt beim ersten Besuch alle Dateien in einen Cache mit Versionsnamen. Anfragen gehen zuerst ins Netz, damit Updates sofort ankommen. Ohne Netz kommt die Antwort aus dem Cache. Details: [Deployment](deployment.md).
+Drei Regeln sorgen dafür, dass immer genau eine Version vollständig läuft und sich nie alte und neue Dateien mischen:
+
+1. **Versionierte Adressen:** Jeder Verweis auf CSS und JavaScript trägt `?v=<Version>`, in `index.html`, in allen `import`-Zeilen und beim Web Worker. Eine neue Version lädt dadurch ausschließlich neue Adressen, die kein Cache kennen kann. `tests/release.test.js` prüft das bei jedem Push.
+2. **Netz zuerst, am Browser-Cache vorbei:** `sw.js` holt jede Datei mit `cache: 'no-cache'` aus dem Netz. Nur ohne Netz kommt sie aus dem Offline-Speicher, der beim Installieren mit `cache: 'reload'` frisch gefüllt wird.
+3. **Einmaliges Neuladen:** Übernimmt ein neuer Service Worker die Kontrolle (`controllerchange`), lädt `main.js` die Seite einmal neu.
+
+Details: [Deployment](deployment.md).

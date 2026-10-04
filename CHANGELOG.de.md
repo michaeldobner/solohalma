@@ -2,6 +2,16 @@
 
 Alle wichtigen Änderungen an SPRING. [English](CHANGELOG.md)
 
+## 2.0.1 (2026-10-04)
+
+### Behoben
+* Auf Geräten, die schon eine frühere Version geladen hatten, konnten sich nach einem Update neue und alte Dateien mischen. Folge: ein leeres Feld unter SPRING, fehlende Beschriftungen der Schaltflächen, ein nach rechts verrutschtes Layout und Schaltflächen ohne Funktion. Jetzt lädt jede Version nur ihre eigenen Dateien (`?v=` an jedem Verweis), der Service Worker umgeht den Browser-Cache und die Seite lädt bei einer neuen Version einmal neu.
+* Auf sehr schmalen iPhones (SE 1. Generation) passen die fünf Schaltflächen jetzt auf den Bildschirm.
+
+### Technik
+* Neues Skript `scripts/release.mjs` setzt eine Versionsnummer überall.
+* Neuer Test `tests/release.test.js` prüft die versionierten Verweise, damit der Fehler nicht wiederkommt. Insgesamt 29 Tests.
+
 ## 2.0.0 (2026-10-04)
 
 Das Spiel heißt jetzt **SPRING**.
