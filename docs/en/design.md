@@ -12,7 +12,7 @@ The board looks like a fine object lying on a table: round, deep blue, with a ra
 | **Tactility** | Light, shadow and physics make the marbles feel like real objects |
 | **Calm** | Short, soft motion. Nothing blinks, nothing moves on its own |
 | **Clarity** | Valid targets are always visible as soon as a marble is selected |
-| **Trust** | Every tap is carried out, even in the middle of an animation. Confirmation only when restarting a game in progress |
+| **Trust** | Every tap is carried out, even in the middle of an animation. No confirmations: whatever happens by mistake, Undo reverses it |
 
 ## Colours
 

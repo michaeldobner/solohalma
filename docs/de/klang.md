@@ -71,7 +71,7 @@ Die Auswahl in den Einstellungen spielt sofort eine kurze Vorschau aus drei aufs
 * Sehr sanfte Stöße bleiben stumm.
 * Kein Dauergeräusch: Rollen ist lautlos, nur Stöße sind zu hören, auch beim Neigen.
 * SPRING respektiert den **Lautlos-Schalter** des iPhones (`navigator.audioSession.type = 'ambient'`, wo verfügbar).
-* iOS erlaubt Ton erst nach einer Berührung. Die Klang-Engine startet deshalb mit dem ersten Tipp.
+* iOS gibt Ton nur beim Loslassen des Fingers oder bei einem vollständigen Tipp frei und hält ihn nach einem App-Wechsel wieder an. SPRING prüft deshalb bei jeder solchen Berührung, ob der Ton läuft, setzt ihn bei Bedarf fort und spielt dazu einen stillen Klang, der Safari zuverlässig freischaltet.
 
 ## Anpassen
 

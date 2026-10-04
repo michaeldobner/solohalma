@@ -95,7 +95,7 @@ A marble without a possible jump wobbles briefly and knocks softly. Tapping an e
 |---|---|
 | **Undo** | Takes back the last move, as often as you like. The captured marble returns from the rim. Also works in the middle of an animation, several quick taps are carried out one after another |
 | **Hint** | Shows the next correct move (see [Hints](#hints)) |
-| **New** | Restarts the current figure. During a game it shows "Sure?", a second tap confirms |
+| **New** | Restarts the current figure immediately, with one tap. Pressed by mistake? Right afterwards **Undo** brings the previous game back |
 | **Figures** | Opens the figure picker |
 | **More** | Opens the settings |
 

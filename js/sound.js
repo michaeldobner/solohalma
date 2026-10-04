@@ -47,20 +47,33 @@ export class Sound {
     if (this.ctx) this.applyStyle();
   }
 
-  // iOS erlaubt Ton erst nach einer Berührung. Der Lautlos-Schalter wird respektiert.
+  // iOS gibt Ton nur bei bestimmten Berührungen frei (Loslassen des Fingers, vollständiger Tipp),
+  // und hält ihn nach einem App-Wechsel wieder an. Deshalb wird bei jeder solchen Berührung
+  // geprüft und bei Bedarf fortgesetzt. Der Lautlos-Schalter wird respektiert.
   unlock() {
-    if (this.ctx) {
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-      return;
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      try {
+        if (navigator.audioSession) navigator.audioSession.type = 'ambient';
+      } catch {
+        // Ältere Systeme kennen audioSession nicht
+      }
+      this.setup(new AC());
     }
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    try {
-      if (navigator.audioSession) navigator.audioSession.type = 'ambient';
-    } catch {
-      // Ältere Systeme kennen audioSession nicht
+    if (this.ctx.state !== 'running') {
+      try {
+        this.ctx.resume();
+        // Ein stiller, sofort gestarteter Klang schaltet Safari zuverlässig frei
+        const buf = this.ctx.createBuffer(1, 1, this.ctx.sampleRate);
+        const src = this.ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(this.ctx.destination);
+        src.start(0);
+      } catch {
+        // Nächste Berührung versucht es erneut
+      }
     }
-    this.setup(new AC());
   }
 
   // Aufbau der Signalkette, auch für Tests mit OfflineAudioContext nutzbar

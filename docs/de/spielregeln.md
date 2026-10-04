@@ -95,7 +95,7 @@ Eine Murmel ohne möglichen Sprung wackelt kurz und klopft leise. Ein Tipp auf e
 |---|---|
 | **Zurück** | Nimmt den letzten Zug zurück, beliebig oft bis zum Start. Die geschlagene Murmel kommt aus dem Rand zurück. Funktioniert auch mitten in einer Animation, mehrere schnelle Tipps werden nacheinander ausgeführt |
 | **Tipp** | Zeigt den nächsten richtigen Zug (siehe [Tipps](#tipps)) |
-| **Neu** | Beginnt die aktuelle Figur von vorn. Bei laufendem Spiel erscheint „Sicher?“, ein zweiter Tipp bestätigt |
+| **Neu** | Beginnt die aktuelle Figur sofort von vorn, mit einem Tipp. Aus Versehen gedrückt? Direkt danach holt **Zurück** das vorherige Spiel wieder zurück |
 | **Figuren** | Öffnet die Figurenauswahl |
 | **Mehr** | Öffnet die Einstellungen |
 

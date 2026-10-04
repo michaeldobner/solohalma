@@ -2,7 +2,7 @@
 //
 // Jede Version lädt nur ihre eigenen Dateien: Alle Verweise tragen ?v=<Version>
 // (siehe scripts/release.mjs). So können sich alte und neue Dateien nie mischen.
-const VERSION = '2.0.2';
+const VERSION = '2.0.3';
 const CACHE = `spring-v${VERSION}`;
 const V = `?v=${VERSION}`;
 

@@ -12,7 +12,7 @@ Das Brett wirkt wie ein hochwertiges Objekt, das auf dem Tisch liegt: rund, tief
 | **Greifbarkeit** | Licht, Schatten und Physik lassen die Murmeln wie echte Objekte wirken |
 | **Ruhe** | Kurze, weiche Bewegungen. Nichts blinkt, nichts bewegt sich von selbst |
 | **Klarheit** | Gültige Ziele sind immer sichtbar, sobald eine Murmel ausgewählt ist |
-| **Verlässlichkeit** | Jeder Tipp wird ausgeführt, auch mitten in einer Animation. Rückfragen nur beim Neustart eines laufenden Spiels |
+| **Verlässlichkeit** | Jeder Tipp wird ausgeführt, auch mitten in einer Animation. Keine Rückfragen: Was versehentlich passiert, macht Zurück rückgängig |
 
 ## Farben
 

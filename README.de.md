@@ -109,4 +109,4 @@ Keine Abhängigkeiten, kein Build-Schritt. Reines HTML, CSS und JavaScript-Modul
 
 ## Version
 
-Aktuelle Version: **2.0.2**. Siehe [Changelog](CHANGELOG.de.md).
+Aktuelle Version: **2.0.3**. Siehe [Changelog](CHANGELOG.de.md).

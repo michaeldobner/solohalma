@@ -109,4 +109,4 @@ No dependencies, no build step. Plain HTML, CSS and JavaScript modules.
 
 ## Version
 
-Current version: **2.0.2**. See the [changelog](CHANGELOG.md).
+Current version: **2.0.3**. See the [changelog](CHANGELOG.md).

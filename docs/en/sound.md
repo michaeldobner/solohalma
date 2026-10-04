@@ -71,7 +71,7 @@ Choosing a style in the settings immediately plays a short preview of three risi
 * Very gentle bumps stay silent.
 * No constant noise: rolling is silent, only bumps can be heard, also while tilting.
 * SPRING respects the iPhone's **silent switch** (`navigator.audioSession.type = 'ambient'` where available).
-* iOS only allows sound after a touch. The sound engine therefore starts with the first tap.
+* iOS only enables sound when a finger is lifted or on a complete tap, and pauses it again after switching apps. SPRING therefore checks on every such touch whether sound is running, resumes it if needed and plays a silent sound that reliably unlocks Safari.
 
 ## Tweaking
 

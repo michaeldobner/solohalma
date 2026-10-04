@@ -1,12 +1,12 @@
-import { FIGURES, GOAL, DEFAULT_FIGURE, figureById, nextFigure } from './figures.js?v=2.0.2';
-import { Game } from './game.js?v=2.0.2';
-import { BoardView } from './view.js?v=2.0.2';
-import { Sound, DEFAULT_STYLE } from './sound.js?v=2.0.2';
-import { load, save, migrate } from './storage.js?v=2.0.2';
-import { lang, t, translateDocument } from './i18n.js?v=2.0.2';
-import { Tilt } from './tilt.js?v=2.0.2';
+import { FIGURES, GOAL, DEFAULT_FIGURE, figureById, nextFigure } from './figures.js?v=2.0.3';
+import { Game } from './game.js?v=2.0.3';
+import { BoardView } from './view.js?v=2.0.3';
+import { Sound, DEFAULT_STYLE } from './sound.js?v=2.0.3';
+import { load, save, migrate } from './storage.js?v=2.0.3';
+import { lang, t, translateDocument } from './i18n.js?v=2.0.3';
+import { Tilt } from './tilt.js?v=2.0.3';
 
-export const VERSION = '2.0.2';
+export const VERSION = '2.0.3';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -59,6 +59,7 @@ const progress = () => game.history.length / Math.max(1, game.startCount - 1);
 const view = new BoardView($('#board'), {
   move(record, phase) {
     if (phase === 'jump') {
+      previousGame = null;
       advanceHint(record);
       updateHud();
       persist();
@@ -83,7 +84,7 @@ function updateHud() {
   const n = game.count;
   $('#count').textContent = n;
   $('#count-label').textContent = t('marbles', { n });
-  $('#undo').disabled = game.history.length === 0;
+  $('#undo').disabled = game.history.length === 0 && !(previousGame && previousGame.figure === figure.id);
   $('#hint').disabled = game.isOver;
   $('#figure-label').textContent = figure.name[lang];
   document.title = `SPRING · ${figure.name[lang]}`;
@@ -177,6 +178,7 @@ async function switchFigure(id) {
   figure = fig;
   game = gameFor(fig);
   hintCache = null;
+  previousGame = null;
   save('figure', fig.id);
   persist();
   updateHud();
@@ -238,7 +240,7 @@ function advanceHint(record) {
 }
 
 function askSolver() {
-  if (!worker) worker = new Worker(new URL('./solver-worker.js?v=2.0.2', import.meta.url), { type: 'module' });
+  if (!worker) worker = new Worker(new URL('./solver-worker.js?v=2.0.3', import.meta.url), { type: 'module' });
   const id = ++hintRequest;
   return new Promise((resolve) => {
     const onMessage = (e) => {
@@ -320,8 +322,17 @@ function hideCoach() {
 
 // ---------- Bedienung ----------
 
+// Neu startet sofort. Das alte Spiel wird gemerkt, damit Zurück es wiederholen kann.
+let previousGame = null;
+
 async function newGame() {
   hideResult();
+  if (game.history.length > 0 && !game.isOver) {
+    previousGame = { figure: figure.id, data: JSON.parse(JSON.stringify(game.serialize())), counted: game.counted };
+    toast(t('restartUndo'));
+  } else {
+    previousGame = null;
+  }
   game.reset();
   game.counted = false;
   hintCache = null;
@@ -332,6 +343,17 @@ async function newGame() {
 
 async function undo() {
   hideResult();
+  // Direkt nach Neu: Zurück holt das vorherige Spiel zurück
+  if (game.history.length === 0 && previousGame && previousGame.figure === figure.id) {
+    game.restore(previousGame.data);
+    game.counted = previousGame.counted;
+    previousGame = null;
+    hideToast();
+    persist();
+    updateHud();
+    await view.morph(game);
+    return;
+  }
   const rec = await view.undo();
   if (!rec) return;
   hintCache = null;
@@ -340,19 +362,6 @@ async function undo() {
   persist();
 }
 
-// Neustart braucht bei laufendem Spiel zwei Tipps
-let confirmTimer = null;
-function restart() {
-  const btn = $('#restart');
-  if (game.history.length === 0 || game.isOver || btn.classList.contains('confirm')) {
-    clearTimeout(confirmTimer);
-    btn.classList.remove('confirm');
-    newGame();
-    return;
-  }
-  btn.classList.add('confirm');
-  confirmTimer = setTimeout(() => btn.classList.remove('confirm'), 2500);
-}
 
 // ---------- Einstellungen ----------
 
@@ -385,7 +394,7 @@ async function toggleTilt() {
 
 $('#undo').addEventListener('click', undo);
 $('#hint').addEventListener('click', hint);
-$('#restart').addEventListener('click', restart);
+$('#restart').addEventListener('click', newGame);
 $('#again').addEventListener('click', newGame);
 $('#back').addEventListener('click', undo);
 $('#next').addEventListener('click', () => {
@@ -433,17 +442,22 @@ $('#style-choice').addEventListener('click', (e) => {
 });
 $('#tilt-toggle').addEventListener('click', toggleTilt);
 
-// Ton und Bewegungssensor erst nach der ersten Berührung freischalten (iOS)
-document.addEventListener('pointerdown', () => {
+// Ton und Bewegungssensor freischalten. iOS erlaubt beides nur beim Loslassen des Fingers
+// oder bei einem vollständigen Tipp, nicht beim ersten Aufsetzen. Deshalb mehrere Ereignisse.
+function unlockFromGesture() {
   sound.unlock();
-  // Neigen war eingeschaltet: Sensor nach der ersten Berührung wieder verbinden (iOS-Erlaubnis)
+  // Neigen war eingeschaltet: Sensor nach einem Neustart wieder verbinden (iOS-Erlaubnis)
   if (tilt.wanted && !tilt.enabled && !tilt.pending) {
     tilt.enable().then(() => {
       save('tilt', tilt.wanted);
       renderSettings();
     });
   }
-}, { passive: true });
+}
+for (const type of ['touchend', 'click', 'keydown']) {
+  document.addEventListener(type, unlockFromGesture, { capture: true, passive: true });
+}
+document.addEventListener('pointerdown', () => sound.unlock(), { capture: true, passive: true });
 
 // Doppeltipp-Zoom und Pinch-Zoom in Safari unterbinden
 document.addEventListener('gesturestart', (e) => e.preventDefault());
@@ -469,4 +483,4 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 }
 
 // Für automatische Tests im Browser
-window.__spring = { view, get game() { return game; }, switchFigure, figures: FIGURES };
+window.__spring = { view, sound, get game() { return game; }, switchFigure, figures: FIGURES };

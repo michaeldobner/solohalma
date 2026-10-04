@@ -2,6 +2,15 @@
 
 All notable changes to SPRING. [Deutsch](CHANGELOG.de.md)
 
+## 2.0.3 (2026-10-04)
+
+### Fixed
+* **Sound after restarting the app** works again right away. iOS only enables sound when a finger is lifted or on a complete tap, not on the first touch, and pauses it after switching apps. SPRING now resumes sound on every such touch.
+* **Tilt after restarting the app** reconnects reliably for the same reason and no longer switches itself off.
+
+### Changed
+* **New needs only one tap.** If it was a mistake, Undo right afterwards brings the previous game back. The "Sure?" confirmation is gone.
+
 ## 2.0.2 (2026-10-04)
 
 ### Fixed

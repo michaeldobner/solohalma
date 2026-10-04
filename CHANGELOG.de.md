@@ -2,6 +2,15 @@
 
 Alle wichtigen Änderungen an SPRING. [English](CHANGELOG.md)
 
+## 2.0.3 (2026-10-04)
+
+### Behoben
+* **Ton nach dem Neustart der App** funktioniert wieder sofort. iOS gibt Ton nur beim Loslassen des Fingers oder bei einem vollständigen Tipp frei, nicht beim ersten Aufsetzen, und hält ihn nach einem App-Wechsel an. SPRING setzt den Ton jetzt bei jeder solchen Berührung fort.
+* **Neigen nach dem Neustart der App** verbindet sich aus demselben Grund zuverlässig und schaltet sich nicht mehr selbst aus.
+
+### Geändert
+* **Neu braucht nur noch einen Tipp.** War es ein Versehen, holt Zurück direkt danach das vorherige Spiel zurück. Die Rückfrage „Sicher?“ entfällt.
+
 ## 2.0.2 (2026-10-04)
 
 ### Behoben

@@ -314,20 +314,6 @@ button {
   }
 }
 
-.icon-btn .label-confirm,
-.icon-btn.confirm .label-normal {
-  display: none;
-}
-
-.icon-btn.confirm .label-confirm {
-  display: inline;
-}
-
-.icon-btn.confirm svg {
-  background: var(--ink);
-  color: var(--bg);
-}
-
 /* ---------- Ergebnis ---------- */
 
 .result {
