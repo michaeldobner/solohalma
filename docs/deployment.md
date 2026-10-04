@@ -11,16 +11,12 @@ Die Veröffentlichung ist automatisiert:
 ```
 Push auf main
    │
-   ▼
-GitHub Actions: Workflow „Pages“ (.github/workflows/pages.yml)
-   ├─ Tests ausführen (npm test)
-   └─ Bei Erfolg: Inhalt von main auf den Branch gh-pages übertragen
-         │
-         ▼
-GitHub Pages veröffentlicht gh-pages automatisch
+   ├─► GitHub Pages veröffentlicht main direkt (Workflow „pages build and deployment“)
+   │
+   └─► GitHub Actions: Workflow „Tests“ (.github/workflows/tests.yml) prüft die Spiellogik
 ```
 
-Schlagen die Tests fehl, wird nichts veröffentlicht und die Live-Version bleibt unverändert.
+Es gibt keinen Build-Schritt. Die Dateien aus `main` werden unverändert ausgeliefert. Änderungen deshalb immer erst auf einem eigenen Branch entwickeln und erst nach grünen Tests in `main` übernehmen.
 
 ## Einstellungen im Repository
 
@@ -28,8 +24,7 @@ Schlagen die Tests fehl, wird nichts veröffentlicht und die Live-Version bleibt
 |---|---|
 | Sichtbarkeit | Public (GitHub Pages ist für private Repos nur mit einem kostenpflichtigen Konto verfügbar) |
 | Settings > Pages > Source | Deploy from a branch |
-| Branch | `gh-pages`, Ordner `/ (root)` |
-| Schreibrecht des Workflows | Im Workflow selbst gesetzt (`permissions: contents: write`) |
+| Branch | `main`, Ordner `/ (root)` |
 
 Die Datei `.nojekyll` sorgt dafür, dass GitHub die Dateien unverändert ausliefert.
 
@@ -39,7 +34,7 @@ Die Datei `.nojekyll` sorgt dafür, dass GitHub die Dateien unverändert auslief
 2. In `sw.js` die Konstante `VERSION` erhöhen, zum Beispiel von `solohalma-v1` auf `solohalma-v2`.
 3. Neue Dateien in die Liste `FILES` in `sw.js` eintragen.
 4. `CHANGELOG.md` ergänzen.
-5. Auf `main` pushen. Nach ein bis zwei Minuten ist die neue Version live.
+5. Auf `main` übernehmen. Nach ein bis zwei Minuten ist die neue Version live.
 
 Den Stand der Veröffentlichung zeigt der Reiter **Actions** im Repository.
 
@@ -53,7 +48,7 @@ Ohne Internet startet die zuletzt geladene Version aus dem Cache.
 
 | Problem | Lösung |
 |---|---|
-| Seite zeigt 404 | Unter Settings > Pages prüfen, ob `gh-pages` als Quelle eingestellt ist, und ob der Workflow erfolgreich war |
-| Workflow scheitert beim Push | Unter Settings > Actions > General prüfen, ob Actions erlaubt sind und Workflows Schreibrechte erhalten dürfen |
+| Seite zeigt 404 | Unter Settings > Pages prüfen, ob `main` und `/ (root)` eingestellt sind, und ob „pages build and deployment“ erfolgreich war |
+| Workflow „Tests“ ist rot | `npm test` lokal ausführen, Fehler beheben, erneut pushen |
 | iPhone zeigt alte Version | App schließen und neu öffnen. Notfalls in Safari: Einstellungen > Apps > Safari > Erweitert > Website-Daten, Eintrag `michaeldobner.github.io` löschen |
 | App-Symbol fehlt auf dem Home-Bildschirm | Prüfen, ob `icons/apple-touch-icon.png` erreichbar ist, dann neu hinzufügen |

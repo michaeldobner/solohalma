@@ -51,7 +51,7 @@ npm start   # lokaler Server
 npm test    # Tests der Spiellogik
 ```
 
-Keine Abhängigkeiten, kein Build-Schritt. Jeder Push auf `main` wird getestet und automatisch veröffentlicht.
+Keine Abhängigkeiten, kein Build-Schritt. Jeder Push wird automatisch getestet, `main` wird direkt auf GitHub Pages veröffentlicht.
 
 ## Technik
 

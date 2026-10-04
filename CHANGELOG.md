@@ -27,4 +27,4 @@ Erste Version.
 ### Technik
 * Progressive Web App, installierbar auf dem Home-Bildschirm, offline spielbar
 * Automatische Speicherung des Spielstands
-* Automatische Veröffentlichung auf GitHub Pages mit Tests vor jedem Release
+* Automatische Veröffentlichung auf GitHub Pages, automatische Tests bei jedem Push
