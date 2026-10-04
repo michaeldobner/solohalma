@@ -3,7 +3,7 @@
 // Es gibt immer genau 32 Murmeln (16 blaue, 16 schwarze). Murmeln, die eine Figur nicht braucht,
 // und geschlagene Murmeln liegen in der Rinne. Beim Wechsel der Figur baut sich das Brett sichtbar um.
 
-import { Gutter } from './gutter.js?v=2.0.1';
+import { Gutter } from './gutter.js?v=2.0.2';
 
 const NS = 'http://www.w3.org/2000/svg';
 const VB = 1000;
@@ -41,16 +41,37 @@ export class BoardView {
       radius: GUTTER_R,
       marbleRadius: MR,
       onCollide: (i) => this.emit('clack', i),
-      onRoll: (level) => this.emit('roll', level),
     });
+    this.chain = Promise.resolve(); // Animationen laufen nacheinander, nie gleichzeitig
 
     this.build();
     this.bindInput();
   }
 
+  // Ein Fehler in einem Ereignis darf das Brett nie blockieren
   emit(name, ...args) {
     const fn = this.events[name];
-    if (fn) fn(...args);
+    if (!fn) return;
+    try {
+      fn(...args);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // Aktion hinten anstellen: Sie startet, sobald die laufende Animation fertig ist.
+  // So geht kein Tipp auf Zurück verloren, auch nicht mitten in einer Animation.
+  run(action) {
+    const next = this.chain.then(async () => {
+      this.busy = true;
+      try {
+        return await action();
+      } finally {
+        this.busy = false;
+      }
+    });
+    this.chain = next.catch((err) => console.error(err));
+    return next;
   }
 
   // ---------- Geometrie ----------
@@ -241,8 +262,11 @@ export class BoardView {
   }
 
   // Mit Animation: Figur wechseln oder neu beginnen
-  async morph(game) {
-    this.busy = true;
+  morph(game) {
+    return this.run(() => this.morphNow(game));
+  }
+
+  async morphNow(game) {
     this.select(-1);
     this.game = game;
     const idMap = this.mapFigure(game);
@@ -273,7 +297,6 @@ export class BoardView {
     this.idMap = idMap;
     this.startLoop();
     await Promise.all(jobs);
-    this.busy = false;
   }
 
   // Eine Murmel vom Brett in die Rinne rollen lassen, möglichst an die nächste freie Stelle
@@ -324,7 +347,6 @@ export class BoardView {
       idle = moving || flying || this.rimTouch ? 0 : idle + 1;
       if (idle > 10) {
         this.loopRunning = false;
-        this.emit('roll', 0);
         return;
       }
       requestAnimationFrame(frame);
@@ -377,8 +399,11 @@ export class BoardView {
 
   // ---------- Züge ----------
 
-  async play(move, fromPos) {
-    this.busy = true;
+  play(move, fromPos) {
+    return this.run(() => this.playNow(move, fromPos));
+  }
+
+  async playNow(move, fromPos) {
     this.targetsEl.innerHTML = '';
     const g = this.game;
     const m = this.marbleOf(g.marbles[move.from]);
@@ -403,16 +428,18 @@ export class BoardView {
 
     await this.toRim(capIndex, 0, 0.8);
     this.emit('move', record, 'gutter');
-    this.busy = false;
     return record;
   }
 
-  async undo() {
-    if (this.busy) return null;
+  // Zurück wartet, bis ein laufender Zug fertig ist. Mehrere Tipps werden nacheinander ausgeführt.
+  undo() {
+    return this.run(() => this.undoNow());
+  }
+
+  async undoNow() {
     const g = this.game;
     const rec = g.undo();
     if (!rec) return null;
-    this.busy = true;
     this.select(-1);
     const m = this.marbleOf(rec.marble);
     const capIndex = this.idMap[rec.captured];
@@ -429,7 +456,6 @@ export class BoardView {
       tween(260, (t) => this.place(m, lerp(ms.x, back.x, t), lerp(ms.y, back.y, t), Math.sin(Math.PI * t))),
     ]);
     cap.flying = false;
-    this.busy = false;
     return rec;
   }
 
@@ -471,7 +497,11 @@ export class BoardView {
   }
 
   down(e) {
-    if (!this.game || this.drag || this.rimTouch) return;
+    if (!this.game) return;
+    // Hängende Berührungen (iOS meldet das Loslassen nicht immer) aufräumen statt das Brett zu sperren
+    if (this.drag && this.drag.id !== e.pointerId) this.cancel({ pointerId: this.drag.id });
+    if (this.rimTouch && this.rimTouch.id !== e.pointerId) this.rimTouch = null;
+    if (this.drag || this.rimTouch) return;
     e.preventDefault();
     const p = this.toSvg(e);
     const r = Math.hypot(p.x - CENTER, p.y - CENTER);
@@ -585,10 +615,7 @@ export class BoardView {
   returnHome(d) {
     const home = this.cellPos(d.from);
     const s = { x: d.m.x, y: d.m.y };
-    this.busy = true;
-    tween(180, (t) => this.place(d.m, lerp(s.x, home.x, t), lerp(s.y, home.y, t), 1)).then(() => {
-      this.busy = false;
-    });
+    this.run(() => tween(180, (t) => this.place(d.m, lerp(s.x, home.x, t), lerp(s.y, home.y, t), 1)));
   }
 }
 

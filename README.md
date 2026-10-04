@@ -25,7 +25,7 @@ SPRING turns the old wooden board game into a calm, tactile experience. A round,
 | | |
 |---|---|
 | **7 figures** | From the gentle *Cross* with 6 marbles to the *Classic* board with 32, every one verified as solvable |
-| **Switch any time** | Change the figure during play. The board rebuilds itself and every figure keeps its own progress |
+| **Switch any time** | Change the figure during play. The board rebuilds itself and a new game begins |
 | **Hints** | A built-in solver shows the next correct move, right from the current position |
 | **Living rim** | Captured marbles roll into the rim. Tap or swipe them and they roll, bump and settle with real physics |
 | **Tilt** | Optional: tilt your iPhone and the marbles in the rim roll downhill |
@@ -64,7 +64,7 @@ SPRING turns the old wooden board game into a calm, tactile experience. A round,
 
 ```bash
 npm start   # local server
-npm test    # 29 automated tests
+npm test    # 30 automated tests
 ```
 
 No dependencies, no build step. Plain HTML, CSS and JavaScript modules.
@@ -109,4 +109,4 @@ No dependencies, no build step. Plain HTML, CSS and JavaScript modules.
 
 ## Version
 
-Current version: **2.0.1**. See the [changelog](CHANGELOG.md).
+Current version: **2.0.2**. See the [changelog](CHANGELOG.md).

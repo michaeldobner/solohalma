@@ -2,6 +2,17 @@
 
 All notable changes to SPRING. [Deutsch](CHANGELOG.de.md)
 
+## 2.0.2 (2026-10-04)
+
+### Fixed
+* **Undo** no longer gets lost: a tap during an animation (for example while the captured marble is still rolling) waits until it has finished. Several quick taps are carried out one after another. The board can no longer get stuck after an error or a lost touch.
+* **Tilt switch**: right after launch it could turn itself back on instead of off while iOS was still asking for permission. The switch now always shows what you chose.
+* **No constant noise**: the rolling sound in the rim has been removed, it was audible all the time while tilting. Bumps still click softly.
+* **End screen** no longer reappears: switching figures always starts a new game, and a finished game starts fresh on the next launch.
+
+### Changed
+* The "in progress" badge on figure cards has been removed, since every switch starts a new game.
+
 ## 2.0.1 (2026-10-04)
 
 ### Fixed

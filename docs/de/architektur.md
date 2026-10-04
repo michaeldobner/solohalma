@@ -98,9 +98,9 @@ Ein **Zug** ist `{ from, over, to }` mit drei Feldindizes. In `history` kommen d
 | Auf einer Murmel ohne Züge | Wackeln und Klopfen |
 | Loslassen nahe einem Ziel | Sprung, sonst rollt die Murmel zurück |
 
-Während einer Animation sind Züge gesperrt (`busy`). Der Rand bleibt auch dann bedienbar.
+**Warteschlange:** `play`, `undo` und `morph` laufen über `run()` nacheinander, nie gleichzeitig. Ein Tipp auf Zurück während einer Animation wartet, bis sie fertig ist, statt verloren zu gehen. `busy` wird in einem `finally` immer zurückgesetzt, und Fehler in Ereignissen werden abgefangen, damit das Brett nie hängen bleibt. Neue Züge auf dem Brett sind während einer Animation gesperrt, der Rand bleibt bedienbar. Meldet iOS das Loslassen eines Fingers nicht, räumt die nächste Berührung den alten Zustand auf.
 
-**Ereignisse an `main.js`:** `move(record, phase)` mit den Phasen `jump`, `land`, `gutter`, außerdem `invalid`, `lift`, `clack(intensität)` und `roll(pegel)`.
+**Ereignisse an `main.js`:** `move(record, phase)` mit den Phasen `jump`, `land`, `gutter`, außerdem `invalid`, `lift`, und `clack(intensität)`.
 
 ### Physik im Rand
 
@@ -142,7 +142,7 @@ Gerät:      gx = cos(β) · sin(γ),   gy = −sin(β)
 Bildschirm: (gx, −gy), gedreht um −Bildschirmwinkel
 ```
 
-Die Werte werden geglättet (Faktor 0,18). Unter einer Länge von 0,07 gilt das Gerät als flach. Auf iOS holt `enable()` die Erlaubnis über `DeviceOrientationEvent.requestPermission()`, was nur nach einer Berührung erlaubt ist.
+Die Werte werden geglättet (Faktor 0,18). Unter einer Länge von 0,07 gilt das Gerät als flach. Auf iOS holt `enable()` die Erlaubnis über `DeviceOrientationEvent.requestPermission()`, was nur nach einer Berührung erlaubt ist. `wanted` (Wunsch, angezeigt im Schalter) und `enabled` (Sensor verbunden) sind getrennt. Wird während einer offenen Erlaubnis-Abfrage ausgeschaltet, gewinnt das Ausschalten.
 
 ### `i18n.js`: Sprachen
 
@@ -158,7 +158,7 @@ Alle Werte liegen im `localStorage` mit dem Präfix `spring:`. Jeder Zugriff ist
 | Schlüssel | Inhalt |
 |---|---|
 | `spring:figure` | Zuletzt gespielte Figur |
-| `spring:game:<figur>` | Spielstand je Figur (`marbles`, `history`, `counted`) |
+| `spring:game:<figur>` | Spielstand der aktuellen Figur (`marbles`, `history`, `counted`), wird beim Start fortgesetzt, außer das Spiel war beendet |
 | `spring:stats` | Je Figur: `games`, `solved`, `perfect`, `best`, `stars` |
 | `spring:sound`, `spring:soundStyle` | Ton an oder aus, Klangfarbe |
 | `spring:tilt` | Neigen an oder aus |
@@ -192,7 +192,7 @@ Karte angetippt
    │
    ▼
 switchFigure(id)
-   ├─ Spielstand der neuen Figur laden (oder aus dem Speicher wiederherstellen)
+   ├─ neues Spiel der gewählten Figur beginnen
    ├─ Anzeige und Liste aktualisieren, Figur merken
    └─ BoardView.morph(game)
         ├─ mapFigure(): Pool-Murmeln den Feldern zuordnen

@@ -98,9 +98,9 @@ A **move** is `{ from, over, to }` with three hole indices. In `history` the ids
 | On a marble without moves | Wobble and knock |
 | Release near a target | Jump, otherwise the marble rolls back |
 
-During an animation moves are locked (`busy`). The rim stays interactive.
+**Queue:** `play`, `undo` and `morph` run one after another through `run()`, never at the same time. A tap on Undo during an animation waits until it has finished instead of getting lost. `busy` is always reset in a `finally` and errors in events are caught, so the board can never get stuck. New moves on the board are locked during an animation, the rim stays interactive. If iOS does not report a finger being lifted, the next touch clears the old state.
 
-**Events to `main.js`:** `move(record, phase)` with the phases `jump`, `land`, `gutter`, plus `invalid`, `lift`, `clack(intensity)` and `roll(level)`.
+**Events to `main.js`:** `move(record, phase)` with the phases `jump`, `land`, `gutter`, plus `invalid`, `lift`, and `clack(intensity)`.
 
 ### Rim physics
 
@@ -142,7 +142,7 @@ device: gx = cos(β) · sin(γ),   gy = −sin(β)
 screen: (gx, −gy), rotated by −screen angle
 ```
 
-Values are smoothed (factor 0.18). Below a length of 0.07 the device counts as flat. On iOS `enable()` asks for permission via `DeviceOrientationEvent.requestPermission()`, which is only allowed after a touch.
+Values are smoothed (factor 0.18). Below a length of 0.07 the device counts as flat. On iOS `enable()` asks for permission via `DeviceOrientationEvent.requestPermission()`, which is only allowed after a touch. `wanted` (the wish, shown in the switch) and `enabled` (sensor connected) are kept separate. Turning it off while the permission prompt is open wins.
 
 ### `i18n.js`: languages
 
@@ -158,7 +158,7 @@ All values live in `localStorage` with the prefix `spring:`. Every access is gua
 | Key | Contents |
 |---|---|
 | `spring:figure` | Figure played last |
-| `spring:game:<figure>` | Progress per figure (`marbles`, `history`, `counted`) |
+| `spring:game:<figure>` | Progress of the current figure (`marbles`, `history`, `counted`), resumed on launch unless the game had ended |
 | `spring:stats` | Per figure: `games`, `solved`, `perfect`, `best`, `stars` |
 | `spring:sound`, `spring:soundStyle` | Sound on or off, sound style |
 | `spring:tilt` | Tilt on or off |
@@ -192,7 +192,7 @@ card tapped
    │
    ▼
 switchFigure(id)
-   ├─ load the new figure's game (or restore it from storage)
+   ├─ start a new game of the chosen figure
    ├─ update display and list, remember the figure
    └─ BoardView.morph(game)
         ├─ mapFigure(): assign pool marbles to holes

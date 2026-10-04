@@ -9,13 +9,12 @@ const TILT_ACCEL = 7; // rad/s² bei voller Neigung
 const TAU = Math.PI * 2;
 
 export class Gutter {
-  constructor({ radius, marbleRadius, onCollide = () => {}, onRoll = () => {} }) {
+  constructor({ radius, marbleRadius, onCollide = () => {} }) {
     this.radius = radius;
     this.gap = (2 * marbleRadius + 1.5) / radius; // kleinster Winkelabstand zweier Murmeln
     this.items = new Map(); // id -> { a: Winkel, v: Winkelgeschwindigkeit }
     this.gravity = { x: 0, y: 0 }; // Neigung in Bildschirmrichtung, Länge bis 1
     this.onCollide = onCollide;
-    this.onRoll = onRoll;
   }
 
   has(id) {
@@ -133,7 +132,6 @@ export class Gutter {
 
     this.collide(items);
     for (const it of items) energy += Math.abs(it.v);
-    this.onRoll(Math.min(1, energy / 6));
     // Ruhe, sobald sich (auch bei Neigung) nichts mehr nennenswert bewegt
     return energy > REST_SPEED * items.length * 2;
   }

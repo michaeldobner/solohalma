@@ -1,19 +1,43 @@
 // Neigung des Geräts als Schwerkraft in Bildschirmrichtung (x nach rechts, y nach unten).
 // iOS verlangt dafür einmalig eine Erlaubnis, die nur nach einer Berührung abgefragt werden darf.
+//
+// "wanted" ist der Wunsch der Person (Schalter), "enabled" der tatsächliche Zustand des Sensors.
+// Beide getrennt zu halten verhindert, dass ein laufender Erlaubnis-Dialog den Schalter verstellt.
 
 const SMOOTHING = 0.18; // Glättung der Sensorwerte
 const DEADZONE = 0.07; // flach liegend soll nichts rollen
 
 export class Tilt {
-  constructor(onChange) {
+  constructor(onChange, wanted = false) {
     this.onChange = onChange;
+    this.wanted = wanted;
     this.enabled = false;
+    this.pending = null;
     this.gx = 0;
     this.gy = 0;
     this.handler = (e) => this.read(e);
   }
 
+  // Ergebnis: 'ok', 'off' (inzwischen wieder ausgeschaltet), 'denied' oder 'unsupported'
   async enable() {
+    this.wanted = true;
+    if (this.enabled) return 'ok';
+    if (!this.pending) this.pending = this.attach().finally(() => (this.pending = null));
+    const result = await this.pending;
+    if (result !== 'ok') this.wanted = false;
+    if (!this.wanted) {
+      this.detach();
+      return result === 'ok' ? 'off' : result;
+    }
+    return result;
+  }
+
+  disable() {
+    this.wanted = false;
+    this.detach();
+  }
+
+  async attach() {
     if (typeof window === 'undefined' || typeof DeviceOrientationEvent === 'undefined') return 'unsupported';
     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
       try {
@@ -28,8 +52,8 @@ export class Tilt {
     return 'ok';
   }
 
-  disable() {
-    window.removeEventListener('deviceorientation', this.handler);
+  detach() {
+    if (typeof window !== 'undefined') window.removeEventListener('deviceorientation', this.handler);
     this.enabled = false;
     this.gx = 0;
     this.gy = 0;
@@ -37,7 +61,7 @@ export class Tilt {
   }
 
   read(e) {
-    if (e.beta === null || e.gamma === null) return;
+    if (!this.wanted || e.beta === null || e.gamma === null) return;
     const [x, y] = gravityFromOrientation(e.beta, e.gamma, screenAngle());
     this.gx += (x - this.gx) * SMOOTHING;
     this.gy += (y - this.gy) * SMOOTHING;

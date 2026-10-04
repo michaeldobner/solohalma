@@ -2,6 +2,17 @@
 
 Alle wichtigen Änderungen an SPRING. [English](CHANGELOG.md)
 
+## 2.0.2 (2026-10-04)
+
+### Behoben
+* **Zurück** geht nicht mehr verloren: Ein Tipp während einer Animation (zum Beispiel solange die geschlagene Murmel noch rollt) wartet, bis sie fertig ist. Mehrere schnelle Tipps werden nacheinander ausgeführt. Das Brett kann nach einem Fehler oder einer verlorenen Berührung nicht mehr hängen bleiben.
+* **Schalter für Neigen**: Direkt nach dem Start konnte er sich wieder einschalten statt aus, solange iOS noch nach der Erlaubnis fragte. Der Schalter zeigt jetzt immer, was du gewählt hast.
+* **Kein Dauerrauschen** mehr: Das Rollgeräusch im Rand ist entfernt, es war beim Neigen ständig zu hören. Stöße klicken weiterhin leise.
+* **Endbildschirm** erscheint nicht mehr erneut: Ein Figurenwechsel startet immer ein neues Spiel, und ein beendetes Spiel beginnt beim nächsten Öffnen neu.
+
+### Geändert
+* Das Abzeichen „läuft“ auf den Figurenkarten ist entfernt, weil jeder Wechsel ein neues Spiel beginnt.
+
 ## 2.0.1 (2026-10-04)
 
 ### Behoben

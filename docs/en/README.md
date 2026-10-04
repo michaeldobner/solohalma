@@ -25,7 +25,7 @@ This documentation describes SPRING completely: how to play, how it looks and so
 | Tech | HTML, CSS, JavaScript modules, SVG, Web Audio, no framework, no build step |
 | Hosting | GitHub Pages, playable offline |
 | Address | https://michaeldobner.github.io/solohalma/ |
-| Version | 2.0.1 |
+| Version | 2.0.2 |
 
 <p>
 <img src="../images/iphone-game-en.jpg" width="230" alt="Game on iPhone">&nbsp;

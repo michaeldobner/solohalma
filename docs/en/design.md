@@ -12,7 +12,7 @@ The board looks like a fine object lying on a table: round, deep blue, with a ra
 | **Tactility** | Light, shadow and physics make the marbles feel like real objects |
 | **Calm** | Short, soft motion. Nothing blinks, nothing moves on its own |
 | **Clarity** | Valid targets are always visible as soon as a marble is selected |
-| **Trust** | No progress is ever lost, so almost no action needs a confirmation |
+| **Trust** | Every tap is carried out, even in the middle of an animation. Confirmation only when restarting a game in progress |
 
 ## Colours
 
@@ -114,7 +114,7 @@ Further rules:
 
 | Component | Description |
 |---|---|
-| Figure card | Mini board, name, number of marbles, stars, five difficulty dots, "in progress" badge. Current figure with a blue outline |
+| Figure card | Mini board, name, number of marbles, stars, five difficulty dots. Current figure with a blue outline |
 | Sheet | Rounded, grabber at the top, closes on swipe down, tap outside or the cross |
 | Switch | iOS style switch, active in `--accent` |
 | Segmented control | Three equal segments for the sound style |

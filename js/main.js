@@ -1,12 +1,12 @@
-import { FIGURES, GOAL, DEFAULT_FIGURE, figureById, nextFigure } from './figures.js?v=2.0.1';
-import { Game } from './game.js?v=2.0.1';
-import { BoardView } from './view.js?v=2.0.1';
-import { Sound, DEFAULT_STYLE } from './sound.js?v=2.0.1';
-import { load, save, migrate } from './storage.js?v=2.0.1';
-import { lang, t, translateDocument } from './i18n.js?v=2.0.1';
-import { Tilt } from './tilt.js?v=2.0.1';
+import { FIGURES, GOAL, DEFAULT_FIGURE, figureById, nextFigure } from './figures.js?v=2.0.2';
+import { Game } from './game.js?v=2.0.2';
+import { BoardView } from './view.js?v=2.0.2';
+import { Sound, DEFAULT_STYLE } from './sound.js?v=2.0.2';
+import { load, save, migrate } from './storage.js?v=2.0.2';
+import { lang, t, translateDocument } from './i18n.js?v=2.0.2';
+import { Tilt } from './tilt.js?v=2.0.2';
 
-export const VERSION = '2.0.1';
+export const VERSION = '2.0.2';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -20,20 +20,28 @@ const sound = new Sound({ enabled: load('sound', true), style: load('soundStyle'
 let stats = load('stats', {});
 const games = new Map();
 let figure = figureById(load('figure', DEFAULT_FIGURE)) || figureById(DEFAULT_FIGURE);
-let game = gameFor(figure);
+let game = gameFor(figure, { resume: true });
+persist();
 let hintCache = null;
 
 // Jede Figur hat ihren eigenen, gespeicherten Spielstand
-function gameFor(fig) {
+// Nur die zuletzt gespielte Figur wird beim Start fortgesetzt. Ein beendetes Spiel beginnt neu.
+function gameFor(fig, { resume = false } = {}) {
   if (!games.has(fig.id)) {
     const g = new Game(fig);
-    const saved = load(`game:${fig.id}`, null);
-    if (saved && g.restore(saved)) g.counted = Boolean(saved.counted);
-    else g.counted = false;
     g.startCount = g.cells.filter((c) => c.start).length;
+    g.counted = false;
     games.set(fig.id, g);
   }
-  return games.get(fig.id);
+  const g = games.get(fig.id);
+  const saved = resume ? load(`game:${fig.id}`, null) : null;
+  if (saved && g.restore(saved) && !g.isOver) {
+    g.counted = Boolean(saved.counted);
+  } else {
+    g.reset();
+    g.counted = false;
+  }
+  return g;
 }
 
 function persist(g = game) {
@@ -64,11 +72,10 @@ const view = new BoardView($('#board'), {
   invalid: () => sound.invalid(),
   lift: () => sound.lift(),
   clack: (i) => sound.clack(i),
-  roll: (level) => sound.roll(level),
 });
 view.setGame(game);
 
-const tilt = new Tilt((x, y) => view.setGravity(x, y));
+const tilt = new Tilt((x, y) => view.setGravity(x, y), load('tilt', false));
 
 // ---------- Anzeige ----------
 
@@ -147,10 +154,6 @@ function renderFigureList() {
   const list = $('#figure-list');
   list.innerHTML = FIGURES.map((fig) => {
     const s = statsFor(fig.id);
-    const g = games.get(fig.id);
-    const savedState = g || load(`game:${fig.id}`, null);
-    const running = g ? g.history.length > 0 && !g.isOver : savedState && savedState.history && savedState.history.length > 0;
-    const left = g ? g.count : savedState ? savedState.marbles.filter((m) => m !== null).length : 0;
     const dots = [1, 2, 3, 4, 5].map((i) => `<i class="${i <= fig.difficulty ? 'on' : ''}"></i>`).join('');
     const count = fig.layout.join('').split('o').length - 1;
     return `<li>
@@ -161,24 +164,24 @@ function renderFigureList() {
         <span class="fc-meta">${count} ${t('marbles', { n: count })}</span>
         <span class="fc-stars" aria-label="${s.stars}/3">${starsHtml(s.stars)}</span>
         <span class="fc-dots" title="${t('difficulty', { n: fig.difficulty })}" aria-label="${t('difficulty', { n: fig.difficulty })}">${dots}</span>
-        ${running ? `<span class="fc-badge">${t('inProgress', { n: left })}</span>` : ''}
       </button>
     </li>`;
   }).join('');
 }
 
+// Beim Wechsel beginnt die gewählte Figur immer als neues Spiel
 async function switchFigure(id) {
   const fig = figureById(id);
-  if (!fig || fig.id === figure.id || view.busy) return;
+  if (!fig || fig.id === figure.id) return;
   hideResult();
   figure = fig;
   game = gameFor(fig);
   hintCache = null;
   save('figure', fig.id);
+  persist();
   updateHud();
   await view.morph(game);
   sound.gutter();
-  if (game.history.length > 0 && game.isOver) showResult();
 }
 
 // ---------- Panels ----------
@@ -235,7 +238,7 @@ function advanceHint(record) {
 }
 
 function askSolver() {
-  if (!worker) worker = new Worker(new URL('./solver-worker.js?v=2.0.1', import.meta.url), { type: 'module' });
+  if (!worker) worker = new Worker(new URL('./solver-worker.js?v=2.0.2', import.meta.url), { type: 'module' });
   const id = ++hintRequest;
   return new Promise((resolve) => {
     const onMessage = (e) => {
@@ -358,19 +361,23 @@ function renderSettings() {
   document.querySelectorAll('#style-choice [data-style]').forEach((b) => {
     b.setAttribute('aria-checked', String(b.dataset.style === sound.style));
   });
-  $('#tilt-toggle').setAttribute('aria-checked', String(tilt.enabled));
+  $('#tilt-toggle').setAttribute('aria-checked', String(tilt.wanted));
 }
 
 async function toggleTilt() {
-  if (tilt.enabled) {
+  if (tilt.wanted) {
     tilt.disable();
     save('tilt', false);
-  } else {
-    const result = await tilt.enable();
-    if (result === 'denied') toast(t('tiltDenied'));
-    if (result === 'unsupported') toast(t('tiltUnsupported'));
-    save('tilt', result === 'ok');
+    renderSettings();
+    return;
   }
+  save('tilt', true);
+  const pending = tilt.enable();
+  renderSettings();
+  const result = await pending;
+  if (result === 'denied') toast(t('tiltDenied'));
+  if (result === 'unsupported') toast(t('tiltUnsupported'));
+  save('tilt', tilt.wanted);
   renderSettings();
 }
 
@@ -413,7 +420,6 @@ $('#figure-list').addEventListener('click', (e) => {
 
 $('#sound-toggle').addEventListener('click', () => {
   sound.enabled = !sound.enabled;
-  if (!sound.enabled) sound.roll(0);
   save('sound', sound.enabled);
   renderSettings();
 });
@@ -430,7 +436,13 @@ $('#tilt-toggle').addEventListener('click', toggleTilt);
 // Ton und Bewegungssensor erst nach der ersten Berührung freischalten (iOS)
 document.addEventListener('pointerdown', () => {
   sound.unlock();
-  if (load('tilt', false) && !tilt.enabled) tilt.enable().then(renderSettings);
+  // Neigen war eingeschaltet: Sensor nach der ersten Berührung wieder verbinden (iOS-Erlaubnis)
+  if (tilt.wanted && !tilt.enabled && !tilt.pending) {
+    tilt.enable().then(() => {
+      save('tilt', tilt.wanted);
+      renderSettings();
+    });
+  }
 }, { passive: true });
 
 // Doppeltipp-Zoom und Pinch-Zoom in Safari unterbinden
@@ -441,7 +453,6 @@ document.addEventListener('dblclick', (e) => e.preventDefault());
 
 updateHud();
 renderSettings();
-if (game.history.length > 0 && game.isOver) showResult();
 setTimeout(showCoach, 900);
 
 // Offline-Betrieb. Übernimmt eine neue Version die Kontrolle, lädt die Seite einmal neu,

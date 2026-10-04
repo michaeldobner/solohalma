@@ -33,7 +33,7 @@ Layout rules:
 * `o` for a marble, `.` for an empty hole, spaces outside the cross.
 * Difficulty from 1 to 5. The list must stay sorted by it, Classic stays last.
 
-Everything else happens automatically: card in the picker, preview, marble colours, separate progress, statistics, stars, hints and "Next figure".
+Everything else happens automatically: card in the picker, preview, marble colours, statistics, stars, hints and "Next figure".
 
 **Important:** not every shape is solvable. Because of a mathematical property of the board (parity classes of the holes) many figures cannot be reduced to one marble in the centre. During development, for example, every staircase shaped figure of 9 marbles that was tested turned out to be unsolvable.
 

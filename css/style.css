@@ -658,22 +658,6 @@ button {
   background: var(--ink);
 }
 
-.fc-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  max-width: calc(100% - 16px);
-  padding: 3px 7px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 /* Einstellungen */
 .setting {
@@ -895,13 +879,6 @@ button {
     grid-area: dots;
   }
 
-  .fc-badge {
-    top: auto;
-    bottom: 6px;
-    right: auto;
-    left: 80px;
-    display: none;
-  }
 
   .sheet {
     max-height: 100%;
@@ -959,8 +936,7 @@ button {
     grid-template-columns: 64px 1fr auto;
     grid-template-areas:
       "svg name stars"
-      "svg meta dots"
-      "svg badge badge";
+      "svg meta dots";
     justify-items: start;
     align-items: center;
     column-gap: 14px;
@@ -991,10 +967,6 @@ button {
     grid-area: dots;
   }
 
-  .fc-badge {
-    grid-area: badge;
-    position: static;
-  }
 
   .figure-name {
     pointer-events: none;

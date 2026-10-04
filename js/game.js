@@ -1,6 +1,6 @@
 // Spiellogik ohne Darstellung. Kennt nur Felder, Murmeln und Sprünge.
 
-import { GOAL } from './figures.js?v=2.0.1';
+import { GOAL } from './figures.js?v=2.0.2';
 
 const DIRECTIONS = [
   [-1, 0],

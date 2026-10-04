@@ -12,7 +12,7 @@ Das Brett wirkt wie ein hochwertiges Objekt, das auf dem Tisch liegt: rund, tief
 | **Greifbarkeit** | Licht, Schatten und Physik lassen die Murmeln wie echte Objekte wirken |
 | **Ruhe** | Kurze, weiche Bewegungen. Nichts blinkt, nichts bewegt sich von selbst |
 | **Klarheit** | Gültige Ziele sind immer sichtbar, sobald eine Murmel ausgewählt ist |
-| **Verlässlichkeit** | Kein Fortschritt geht verloren, deshalb braucht kaum eine Aktion eine Rückfrage |
+| **Verlässlichkeit** | Jeder Tipp wird ausgeführt, auch mitten in einer Animation. Rückfragen nur beim Neustart eines laufenden Spiels |
 
 ## Farben
 
@@ -114,7 +114,7 @@ Weitere Regeln:
 
 | Komponente | Beschreibung |
 |---|---|
-| Figurenkarte | Mini-Brett, Name, Zahl der Murmeln, Sterne, fünf Schwierigkeitspunkte, Abzeichen „läuft“. Aktive Figur mit blauem Rahmen |
+| Figurenkarte | Mini-Brett, Name, Zahl der Murmeln, Sterne, fünf Schwierigkeitspunkte. Aktive Figur mit blauem Rahmen |
 | Blatt | Abgerundet, mit Griff oben, schließt per Wischen nach unten, Tipp daneben oder Kreuz |
 | Schalter | iOS-typischer Schalter, aktiv in `--accent` |
 | Segmentauswahl | Drei gleich breite Felder für die Klangfarbe |

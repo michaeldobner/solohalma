@@ -33,7 +33,7 @@ Regeln für das Layout:
 * `o` für eine Murmel, `.` für ein leeres Feld, Leerzeichen außerhalb des Kreuzes.
 * Schwierigkeit von 1 bis 5. Die Liste muss danach aufsteigend sortiert sein, Klassisch bleibt zuletzt.
 
-Alles andere passiert automatisch: Karte in der Auswahl, Vorschau, Farben der Murmeln, eigener Spielstand, Statistik, Sterne, Tipps und „Nächste Figur“.
+Alles andere passiert automatisch: Karte in der Auswahl, Vorschau, Farben der Murmeln, Statistik, Sterne, Tipps und „Nächste Figur“.
 
 **Wichtig:** Nicht jede Form ist lösbar. Wegen einer mathematischen Eigenschaft des Bretts (Paritätsklassen der Felder) gehen viele Figuren nicht bis auf eine Murmel in der Mitte auf. So waren bei der Entwicklung zum Beispiel alle getesteten treppenförmigen Figuren aus 9 Murmeln nicht lösbar.
 

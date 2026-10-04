@@ -34,7 +34,6 @@ The partial ratio 1 : 2.76 : 5.4 is that of a freely vibrating body. It sounds l
 | Undo | Like a landing, quieter and two steps lower | about −17 dB |
 | Marble rolls into the rim | Deeper wood, soft ceramic click | about −21 dB |
 | Marbles bump in the rim | Fine click, level follows impact | −25 to −35 dB |
-| Marbles roll in the rim | Very quiet, soft noise following speed | very quiet |
 | Invalid marble | Two muted, low wooden knocks | about −19 dB |
 | Figure solved | Rising triad with a long decay | about −11 dB |
 | Masterful | Plus a fourth note and a bell tone | about −10 dB |
@@ -70,7 +69,7 @@ Choosing a style in the settings immediately plays a short preview of three risi
 
 * At most 8 clicks per second from the rim and at least 45 ms between two clicks.
 * Very gentle bumps stay silent.
-* The rolling sound fades in and out smoothly.
+* No constant noise: rolling is silent, only bumps can be heard, also while tilting.
 * SPRING respects the iPhone's **silent switch** (`navigator.audioSession.type = 'ambient'` where available).
 * iOS only allows sound after a touch. The sound engine therefore starts with the first tap.
 

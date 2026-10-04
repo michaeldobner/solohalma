@@ -25,7 +25,7 @@ SPRING macht aus dem alten Holzbrettspiel ein ruhiges, fast greifbares Erlebnis.
 | | |
 |---|---|
 | **7 Figuren** | Vom sanften *Kreuz* mit 6 Murmeln bis zum *Klassisch*-Brett mit 32, jede auf Lösbarkeit geprüft |
-| **Jederzeit wechseln** | Die Figur lässt sich mitten im Spiel wechseln. Das Brett baut sich sichtbar um, jede Figur behält ihren eigenen Spielstand |
+| **Jederzeit wechseln** | Die Figur lässt sich mitten im Spiel wechseln. Das Brett baut sich sichtbar um und ein neues Spiel beginnt |
 | **Tipps** | Ein eingebauter Löser zeigt den nächsten richtigen Zug, direkt aus der aktuellen Stellung |
 | **Lebendiger Rand** | Geschlagene Murmeln rollen in den Rand. Antippen oder Wischen lässt sie mit echter Physik rollen, anstoßen und zur Ruhe kommen |
 | **Neigen** | Optional: iPhone neigen und die Murmeln im Rand rollen bergab |
@@ -64,7 +64,7 @@ SPRING macht aus dem alten Holzbrettspiel ein ruhiges, fast greifbares Erlebnis.
 
 ```bash
 npm start   # lokaler Server
-npm test    # 29 automatische Tests
+npm test    # 30 automatische Tests
 ```
 
 Keine Abhängigkeiten, kein Build-Schritt. Reines HTML, CSS und JavaScript-Module.
@@ -109,4 +109,4 @@ Keine Abhängigkeiten, kein Build-Schritt. Reines HTML, CSS und JavaScript-Modul
 
 ## Version
 
-Aktuelle Version: **2.0.1**. Siehe [Changelog](CHANGELOG.de.md).
+Aktuelle Version: **2.0.2**. Siehe [Changelog](CHANGELOG.de.md).

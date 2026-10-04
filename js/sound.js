@@ -91,7 +91,6 @@ export class Sound {
     this.tone.connect(this.comp).connect(this.master).connect(ctx.destination);
 
     this.noise = this.noiseBuffer(1);
-    this.setupRoll();
     this.applyStyle();
   }
 
@@ -226,28 +225,6 @@ export class Sound {
     const step = 10 + Math.floor(Math.random() * 5);
     this.transient(t, 0.3 * v, 4500);
     this.ceramic(t, 0.5 * v * this.preset.ceramic, stepFrequency(step), 0.35, 2);
-  }
-
-  // Leises Rollen in der Rinne, level von 0 bis 1
-  setupRoll() {
-    const ctx = this.ctx;
-    const src = ctx.createBufferSource();
-    src.buffer = this.noise;
-    src.loop = true;
-    const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 700;
-    bp.Q.value = 0.8;
-    this.rollGain = ctx.createGain();
-    this.rollGain.gain.value = 0;
-    src.connect(bp).connect(this.rollGain).connect(this.bus);
-    src.start();
-  }
-
-  roll(level) {
-    if (!this.ctx || !this.rollGain) return;
-    const target = this.enabled ? Math.min(1, level) * 0.035 : 0;
-    this.rollGain.gain.setTargetAtTime(target, this.ctx.currentTime, 0.08);
   }
 
   // Murmel landet in der Rinne

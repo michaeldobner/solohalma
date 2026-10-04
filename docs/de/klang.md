@@ -34,7 +34,6 @@ Das Teiltonverhältnis 1 : 2,76 : 5,4 entspricht einem frei schwingenden Klangk�
 | Zurück | Wie Landung, leiser und zwei Stufen tiefer | etwa −17 dB |
 | Murmel rollt in den Rand | Tieferes Holz, sanftes Keramik-Klicken | etwa −21 dB |
 | Murmeln stoßen im Rand an | Feiner Klick, Lautstärke nach Aufprall | −25 bis −35 dB |
-| Murmeln rollen im Rand | Sehr leises, weiches Rauschen nach Geschwindigkeit | sehr leise |
 | Ungültige Murmel | Zwei gedämpfte, tiefe Holzklopfer | etwa −19 dB |
 | Figur gelöst | Aufsteigender Dreiklang mit langem Ausklang | etwa −11 dB |
 | Meisterhaft | Zusätzlich ein vierter Ton und ein Glockenton | etwa −10 dB |
@@ -70,7 +69,7 @@ Die Auswahl in den Einstellungen spielt sofort eine kurze Vorschau aus drei aufs
 
 * Höchstens 8 Klicks pro Sekunde aus dem Rand und mindestens 45 ms Abstand zwischen zwei Klicks.
 * Sehr sanfte Stöße bleiben stumm.
-* Das Rollgeräusch blendet weich ein und aus.
+* Kein Dauergeräusch: Rollen ist lautlos, nur Stöße sind zu hören, auch beim Neigen.
 * SPRING respektiert den **Lautlos-Schalter** des iPhones (`navigator.audioSession.type = 'ambient'`, wo verfügbar).
 * iOS erlaubt Ton erst nach einer Berührung. Die Klang-Engine startet deshalb mit dem ersten Tipp.
 

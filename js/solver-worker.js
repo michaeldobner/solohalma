@@ -1,5 +1,5 @@
 // Rechnet Tipps im Hintergrund, damit die Oberfläche flüssig bleibt.
-import { prepare, solve } from './solver.js?v=2.0.1';
+import { prepare, solve } from './solver.js?v=2.0.2';
 
 let cache = null;
 

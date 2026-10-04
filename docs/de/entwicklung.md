@@ -25,14 +25,14 @@ Sprache testen: Die Sprache folgt der Browsersprache. In Chrome unter Einstellun
 npm test
 ```
 
-29 Tests mit dem eingebauten Test-Runner von Node.js. Sie laufen außerdem bei jedem Push über GitHub Actions (`.github/workflows/tests.yml`).
+30 Tests mit dem eingebauten Test-Runner von Node.js. Sie laufen außerdem bei jedem Push über GitHub Actions (`.github/workflows/tests.yml`).
 
 | Datei | Prüft |
 |---|---|
 | `tests/game.test.js` | Startstellung, erste Züge, keine Diagonalen, Sprung und Zurück, Speichern und Laden, vollständige Lösung, Bewertung |
 | `tests/figures.test.js` | Alle Figuren auf dem 33er-Brett, **jede Figur lösbar bis Meisterhaft**, Sortierung, Navigation, Erkennen unlösbarer Stellungen |
 | `tests/gutter.test.js` | 31 Murmeln passen in den Rand, Bewegung kommt zur Ruhe, Stöße geben Schwung weiter, Neigung sammelt Murmeln unten, freie Plätze, Finger schiebt |
-| `tests/tilt.test.js` | Schwerkraft aus Gerätewinkeln in Hoch- und Querformat |
+| `tests/tilt.test.js` | Schwerkraft aus Gerätewinkeln in Hoch- und Querformat, Schalter für Neigen auch während der Erlaubnis-Abfrage |
 | `tests/i18n.test.js` | Spracherkennung, Einzahl und Mehrzahl, gleiche Schlüssel in beiden Sprachen, keine Gedankenstriche |
 | `tests/release.test.js` | Alle Verweise tragen die aktuelle Version, Versionsnummern stimmen überein, der Service Worker kennt jedes Modul |
 

@@ -93,7 +93,7 @@ A marble without a possible jump wobbles briefly and knocks softly. Tapping an e
 
 | Button | Function |
 |---|---|
-| **Undo** | Takes back the last move, as often as you like. The captured marble returns from the rim |
+| **Undo** | Takes back the last move, as often as you like. The captured marble returns from the rim. Also works in the middle of an animation, several quick taps are carried out one after another |
 | **Hint** | Shows the next correct move (see [Hints](#hints)) |
 | **New** | Restarts the current figure. During a game it shows "Sure?", a second tap confirms |
 | **Figures** | Opens the figure picker |
@@ -109,11 +109,11 @@ At the end of a game a card shows the rating, stars and statistics.
 
 ### Progress
 
-Every move is saved automatically, separately for each figure. Close the app and you continue exactly where you left off, on the figure you played last.
+Every move is saved automatically. Close the app and you continue exactly where you left off, on the figure you played last. If that game had already ended, a new one begins on the next launch, without showing the result card again.
 
 ## Switching figures
 
-You can switch the figure **at any time during play**, without a confirmation, because no progress is ever lost.
+You can switch the figure **at any time during play**. The chosen figure **always starts as a new game**. Stars and statistics are of course kept.
 
 | Device | How |
 |---|---|
@@ -121,7 +121,7 @@ You can switch the figure **at any time during play**, without a confirmation, b
 | iPhone landscape | **Figures** opens a drawer from the left with a vertical list |
 | iPad landscape | All figures are always visible in the sidebar on the left, one tap is enough |
 
-Each card shows a preview of the figure, the number of marbles, the stars reached, the difficulty and, for a game in progress, a badge such as "in progress · 4 left".
+Each card shows a preview of the figure, the number of marbles, the stars reached and the difficulty.
 
 When you switch, the board visibly rebuilds itself: marbles that are not needed roll into the rim, the ones that are needed jump from the rim to their holes. The sheet stays open so you can browse at your leisure. Swipe down, tap outside or tap the cross to close it.
 

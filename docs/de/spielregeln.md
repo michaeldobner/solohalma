@@ -93,7 +93,7 @@ Eine Murmel ohne möglichen Sprung wackelt kurz und klopft leise. Ein Tipp auf e
 
 | Schaltfläche | Funktion |
 |---|---|
-| **Zurück** | Nimmt den letzten Zug zurück, beliebig oft bis zum Start. Die geschlagene Murmel kommt aus dem Rand zurück |
+| **Zurück** | Nimmt den letzten Zug zurück, beliebig oft bis zum Start. Die geschlagene Murmel kommt aus dem Rand zurück. Funktioniert auch mitten in einer Animation, mehrere schnelle Tipps werden nacheinander ausgeführt |
 | **Tipp** | Zeigt den nächsten richtigen Zug (siehe [Tipps](#tipps)) |
 | **Neu** | Beginnt die aktuelle Figur von vorn. Bei laufendem Spiel erscheint „Sicher?“, ein zweiter Tipp bestätigt |
 | **Figuren** | Öffnet die Figurenauswahl |
@@ -109,11 +109,11 @@ Am Spielende erscheint eine Karte mit Bewertung, Sternen und Statistik.
 
 ### Spielstand
 
-Jeder Zug wird automatisch gespeichert, für jede Figur getrennt. Wer die App schließt, macht beim nächsten Öffnen genau dort weiter, bei der zuletzt gespielten Figur.
+Jeder Zug wird automatisch gespeichert. Wer die App schließt, macht beim nächsten Öffnen genau dort weiter, bei der zuletzt gespielten Figur. War das Spiel schon beendet, beginnt beim nächsten Öffnen ein neues, ohne die Ergebniskarte erneut zu zeigen.
 
 ## Figur wechseln
 
-Die Figur lässt sich **jederzeit im Spiel** wechseln, ohne Sicherheitsabfrage, weil kein Fortschritt verloren geht.
+Die Figur lässt sich **jederzeit im Spiel** wechseln. Die gewählte Figur beginnt dabei **immer als neues Spiel**. Sterne und Statistik bleiben natürlich erhalten.
 
 | Gerät | So geht es |
 |---|---|
@@ -121,7 +121,7 @@ Die Figur lässt sich **jederzeit im Spiel** wechseln, ohne Sicherheitsabfrage, 
 | iPhone quer | **Figuren** öffnet eine Schublade von links mit einer senkrechten Liste |
 | iPad quer | Alle Figuren stehen dauerhaft in der Seitenleiste links, ein Tipp genügt |
 
-Jede Karte zeigt eine Vorschau der Figur, die Zahl der Murmeln, die erreichten Sterne, die Schwierigkeit und bei einem angefangenen Spiel ein Abzeichen wie „läuft · 4 übrig“.
+Jede Karte zeigt eine Vorschau der Figur, die Zahl der Murmeln, die erreichten Sterne und die Schwierigkeit.
 
 Beim Wechsel baut sich das Brett sichtbar um: Nicht gebrauchte Murmeln rollen in den Rand, benötigte springen aus dem Rand auf ihre Plätze. Das Blatt bleibt offen, so lässt sich in Ruhe durchblättern. Wischen nach unten, ein Tipp daneben oder das Kreuz schließt es.
 

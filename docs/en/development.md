@@ -25,14 +25,14 @@ Testing the language: it follows the browser language. In Chrome under Settings 
 npm test
 ```
 
-29 tests using the built-in Node.js test runner. They also run on every push via GitHub Actions (`.github/workflows/tests.yml`).
+30 tests using the built-in Node.js test runner. They also run on every push via GitHub Actions (`.github/workflows/tests.yml`).
 
 | File | Checks |
 |---|---|
 | `tests/game.test.js` | Starting position, first moves, no diagonals, jump and undo, save and load, full solution, rating |
 | `tests/figures.test.js` | Every figure uses the 33-hole board, **every figure solvable to Masterful**, ordering, navigation, detecting unsolvable positions |
 | `tests/gutter.test.js` | 31 marbles fit into the rim, motion comes to rest, bumps pass on momentum, tilt gathers marbles at the bottom, free spots, finger pushes |
-| `tests/tilt.test.js` | Gravity from device angles in portrait and landscape |
+| `tests/tilt.test.js` | Gravity from device angles in portrait and landscape, tilt switch even while the permission prompt is open |
 | `tests/i18n.test.js` | Language detection, singular and plural, same keys in both languages, no dashes |
 | `tests/release.test.js` | Every reference carries the current version, version numbers match, the service worker knows every module |
 

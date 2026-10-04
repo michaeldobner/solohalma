@@ -13,7 +13,6 @@ const STRINGS = {
     settings: 'Mehr',
     close: 'Schließen',
     chooseFigure: 'Figur wählen',
-    inProgress: 'läuft · {n} übrig',
     difficulty: 'Schwierigkeit {n} von 5',
     coach: 'Hier wechselst du die Figur',
     // Ergebnis
@@ -60,7 +59,6 @@ const STRINGS = {
     settings: 'More',
     close: 'Close',
     chooseFigure: 'Choose a figure',
-    inProgress: 'in progress · {n} left',
     difficulty: 'Difficulty {n} of 5',
     coach: 'Change the figure here',
     gameOver: 'Game over',
